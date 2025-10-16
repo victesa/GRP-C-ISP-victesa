@@ -51,4 +51,4 @@ const TransactionDetails = ({ transaction }) => {
   );
 };
 
-export default TransactionDetails;
+export default TransactionDetails;// Updated Oct 16
