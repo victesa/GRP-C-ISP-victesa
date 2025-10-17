@@ -1,0 +1,5 @@
+Flask
+firebase-admin
+python-dotenv
+flask-cors
+sib-api-v3-sdk
