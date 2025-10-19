@@ -21,4 +21,4 @@ const StageWaitingForDocs = ({ transaction }) => {
   );
 };
 
-export default StageWaitingForDocs;
+export default StageWaitingForDocs;// Updated Oct 19
