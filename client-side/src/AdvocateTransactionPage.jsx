@@ -135,4 +135,4 @@ const AdvocateTransactionDetailPage = () => {
   );
 };
 
-export default AdvocateTransactionDetailPage;
+export default AdvocateTransactionDetailPage;// Updated Oct 28
