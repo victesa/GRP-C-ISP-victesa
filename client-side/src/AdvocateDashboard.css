@@ -1,0 +1,24 @@
+.advocate-dashboard-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Styles for the "Advocate Panel" title row */
+.advocate-dashboard-container .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px; /* Space between title and summary cards */
+}
+
+.advocate-dashboard-container .page-header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #212529; /* Dark text */
+  margin: 0;
+}
+
+.advocate-dashboard-container .page-actions {
+  display: flex;
+  gap: 10px;
+}

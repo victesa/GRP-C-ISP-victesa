@@ -1,0 +1,32 @@
+.app-layout {
+  /* This parent is just a container */
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+.app-content-wrapper {
+  /* This is the main block on the right */
+  display: flex;
+  flex-direction: column; /* Stacks Topbar on top of app-content */
+  flex-grow: 1;
+  height: 100vh; /* Full screen height */
+  
+  /* --- FIX: This pushes it to the right of the sidebar --- */
+  margin-left: 260px; /* MUST match your sidebar's width */
+}
+
+.app-content {
+  flex-grow: 1; /* Makes the content fill the remaining space */
+  overflow-y: auto; /* THIS is now the only scrolling part */
+  background-color: #f8f9fa;
+  padding: 30px; /* Adds padding to your pages */
+}
+
+/* --- Hides the scrollbar on the content area --- */
+.app-content {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.app-content::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}

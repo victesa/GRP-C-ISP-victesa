@@ -1,0 +1,383 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary-green: #4CAF50;
+    --primary-blue: #007bff;
+    --primary-orange: #ff9800;
+    --text-dark: #333;
+    --text-medium: #555;
+    --text-light: #777;
+    --bg-light-gray: #f8f9fa;
+    --card-bg: #fff;
+    --border-color: #e0e0e0;
+    --shadow-light: rgba(0, 0, 0, 0.05);
+    --light-green-bg: #e6f7e6;
+}
+
+/* This rule styles your white background div.
+  It fills the screen and centers the green container.
+*/
+#authenticator-setup-screen {
+    /* REMOVE width: 100%; */
+    
+    /* ADD THESE 3 LINES */
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+
+    /* ADD THIS to make it fill the screen */
+
+    /* These are correct for centering */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* This centers it vertically */
+    
+    background-color: white;
+    box-sizing: border-box;
+    height: 100vh;
+}
+
+/* This rule styles your green container.
+  It is "smaller" (90% width, max 1200px) so it can be centered.
+*/
+.authenticator-setup-container {
+    background-color: var(--light-green-bg);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px var(--shadow-light);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    max-width: 1200px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+}
+
+.logo-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary-green);
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.user-icon svg {
+    font-size: 24px;
+    color: var(--text-light);
+}
+
+.main-content {
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.main-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--text-dark);
+    text-align: center;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: var(--text-medium);
+    margin-bottom: 40px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.steps-container {
+    display: flex;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    overflow: hidden;
+}
+
+.step-column {
+    flex: 1;
+    min-width: 300px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border-right: 1px solid var(--border-color);
+}
+
+.step-column:last-child {
+    border-right: none;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+}
+
+.step-1-color { background-color: var(--primary-blue); }
+.step-2-color { background-color: var(--primary-orange); }
+.step-3-color { background-color: var(--primary-green); }
+
+.step-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-dark);
+}
+
+.step-description {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 20px;
+    line-height: 1.4;
+    min-height: 40px; 
+}
+
+.app-badges {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    height: 35px;
+}
+
+/* Add these styles to your CSS file. 
+  This replaces the old .app-badge rules to make them look like choices.
+*/
+.app-badge {
+    cursor: pointer;
+    border: 3px solid #f0f0f0; /* Default light border for all options */
+    background-color: #f9f9f9;
+    padding: 4px; /* Adds a little space inside the border */
+    border-radius: 10px;
+    opacity: 0.7; /* Non-selected items are slightly faded */
+    transform: scale(0.98); /* Non-selected items are slightly smaller */
+    transition: all 0.2s ease-in-out;
+}
+
+/* On hover, any option becomes fully visible and slightly larger */
+.app-badge:hover {
+    opacity: 1;
+    transform: scale(1.05);
+    border-color: #ccc; /* Hover border color */
+}
+
+/* This style applies ONLY to the selected item */
+.app-badge.active {
+    opacity: 1;
+    transform: scale(1.05); /* Stays larger */
+    border-color: #007aff; /* Clear blue "selected" border */
+    background-color: #fff;
+    box-shadow: 0 4px 14px rgba(0, 122, 255, 0.3);
+}
+
+/* This style ensures the new Step 1 QR codes are sized correctly */
+.download-qr {
+    width: 120px;
+    height: 120px;
+    margin-top: 15px;
+}
+
+.qr-scan-area {
+    width: 180px;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    border: 1px dashed var(--primary-green);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.scan-qr-code {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.code-inputs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    height: 55px;
+    align-items: center;
+}
+
+.code-input {
+    width: 45px;
+    height: 55px;
+    font-size: 1.5rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.code-input:focus {
+    border-color: var(--primary-green);
+}
+
+.verify-button {
+    background-color: var(--primary-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-bottom: 15px;
+}
+
+.verify-button:hover {
+    background-color: #388e3c;
+}
+
+.button-hint {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    color: var(--text-light);
+    background-color: var(--card-bg);
+}
+
+.footer-links a {
+    color: var(--text-light);
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 960px) {
+    .steps-container {
+        flex-direction: column;
+    }
+
+    .step-column {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        min-width: unset;
+    }
+
+    .step-column:last-child {
+        border-bottom: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .header, .footer {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    .main-content {
+        padding: 30px 20px;
+    }
+    .main-title {
+        font-size: 1.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #authenticator-setup-screen {
+        padding: 0;
+    }
+
+    .authenticator-setup-container {
+        border-radius: 0;
+        margin: 0;
+        min-height: 100vh;
+        width: 100%;
+        max-width: 100%;
+    }
+    .main-title {
+        font-size: 1.5rem;
+    }
+    .app-badges {
+        flex-direction: column;
+        height: auto;
+    }
+    .code-inputs {
+        flex-wrap: wrap;
+        justify-content: center;
+        height: auto;
+    }
+    .code-input {
+        width: 38px;
+        height: 48px;
+    }
+}
+
+/* Add these new rules to your CSS file */
+
+.qr-scan-area {
+  /* This ensures the QR code has a white padded background */
+  background-color: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  
+  /* This centers the <svg> element from react-qr-code */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Explicit size to hold its shape, adjust as needed */
+  width: 184px; /* 160px QR + 12px padding*2 */
+  height: 184px;
+  margin: 0 auto; /* Center the area in the column */
+}
+
+.otp-error-message {
+  color: #d9534f; /* Red */
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 15px;
+  text-align: center;
+}

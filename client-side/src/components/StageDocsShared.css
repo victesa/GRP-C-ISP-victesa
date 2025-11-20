@@ -1,0 +1,89 @@
+/* --- ADD THESE STYLES to your existing StageDocsShared.css file --- */
+
+/* --- Verification Status Box --- */
+.verification-status-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.status-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.status-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.status-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-text span {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.status-text strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.status-text strong.pending {
+  color: #777;
+}
+
+.status-text strong.verified {
+  color: #008000; /* Green */
+}
+
+.status-text strong.rejected {
+  color: var(--button-reject-text); /* Red */
+}
+
+
+/* --- Action Message (for when user has already acted) --- */
+.action-message {
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-top: 1px solid var(--stage-card-border);
+  padding-top: 24px;
+  margin-top: 24px;
+}
+.action-message img {
+  width: 20px;
+  height: 20px;
+}
+
+.action-message.accepted {
+  background-color: #f0fff4;
+  color: #006400; /* Darker green */
+}
+
+.action-message.rejected {
+  background-color: var(--button-reject-bg);
+  color: var(--button-reject-text);
+}
+
+/* --- Tweak Action Buttons --- */
+.stage-actions .button-accept img {
+  /* The default accept button in your CSS didn't have an icon */
+  width: 14px;
+  height: 14px;
+  filter: brightness(0) invert(1); /* Makes PNG icon white */
+}

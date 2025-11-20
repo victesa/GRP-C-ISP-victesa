@@ -1,0 +1,155 @@
+/* --- CSS Variables - CORRECTED --- */
+:root {
+  /* Using the dark navy from your image */
+  --sidebar-bg: #191C36; 
+
+  /* --- FIX: This was a dark color, making text invisible --- */
+  --sidebar-text: #a9b0c2; /* Muted light gray for text */
+  
+  --sidebar-text-active: #ffffff; /* White for active/logo */
+  
+  /* --- FIX: Changed to the light blue from the image --- */
+  --sidebar-active-bg: #2c2e5d; 
+  --sidebar-hover-bg: #25274c;
+  
+  --sidebar-section-header: #70a0a0;
+  
+  /* --- FIX: Used theme color for divider --- */
+  --sidebar-divider: #2c2e5d; 
+  
+  --notification-badge: #e63946;
+  --logo-icon-bg: #1abc9c;
+}
+
+/* --- Base --- */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+.sidebar-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  vertical-align: middle;
+}
+
+/* --- Main Sidebar Container (FIXED) --- */
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background-color: var(--sidebar-bg); /* Uses the dark navy */
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid var(--sidebar-hover-bg); /* Darker border */
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+/* --- Top (scrollable) & Bottom (fixed) areas --- */
+.sidebar-main {
+  flex-grow: 1;
+  padding: 20px 16px 0 16px;
+  overflow-y: auto;
+}
+.sidebar-main::-webkit-scrollbar {
+  display: none;
+}
+.sidebar-main {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.sidebar-bottom {
+  flex-shrink: 0;
+  padding: 0 16px 20px 16px;
+}
+
+/* --- Logo styles --- */
+.sidebar-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 0 4px;
+}
+
+.sidebar-logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: var(--logo-icon-bg);
+  border-radius: 8px;
+}
+.sidebar-logo-icon img {
+  width: 20px;
+  height: 20px;
+}
+
+.sidebar-logo-section h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white; /* Kept your white color */
+  margin: 0;
+}
+
+/* --- Navigation List --- */
+.sidebar-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav-item a {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: var(--sidebar-text); /* Now uses the light gray color */
+  border-radius: 6px;
+  font-weight: 500; /* Bolder font */
+  font-size: 0.95rem;
+  transition: background-color 0.2s, color 0.2s;
+  position: relative;
+}
+
+.sidebar-nav-item a:hover {
+  background-color: var(--sidebar-hover-bg);
+  color: var(--sidebar-text-active);
+}
+
+/* --- FIX: This selector now targets the <a> tag directly --- */
+/* NavLink adds the 'active' class to the <a> tag */
+.sidebar-nav-item a.active {
+  background-color: var(--sidebar-active-bg);
+  color: var(--sidebar-text-active);
+  font-weight: 600;
+}
+
+/* --- Notification Badge --- */
+.nav-notification-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background-color: var(--notification-badge);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+/* --- Horizontal Divider --- */
+.sidebar-divider {
+  border: none;
+  height: 1px;
+  background-color: var(--sidebar-hover-bg); /* Use theme color */
+  margin: 16px 0;
+}

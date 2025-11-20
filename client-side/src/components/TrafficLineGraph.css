@@ -1,0 +1,66 @@
+/* --- TrafficLineGraph Specific CSS Variables --- */
+:root {
+  /* Inherits card styles from ReviewTasksCard or Dashboard if placed there */
+  --graph-card-bg: #ffffff;
+  --graph-card-border: #e0e0e0;
+  --graph-card-shadow: rgba(0, 0, 0, 0.05);
+  --graph-header-text: #212529;
+  --graph-control-bg: #f8f9fa; /* Light background for controls */
+  --graph-control-border: #e0e0e0;
+  --graph-control-text: #495057;
+  --graph-control-active-bg: #1abc9c; /* Our active teal */
+  --graph-control-active-text: #ffffff;
+}
+
+.traffic-line-graph-card {
+  background-color: var(--graph-card-bg);
+  border: 1px solid var(--graph-card-border);
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 12px var(--graph-card-shadow);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  margin-right: 20px; /* Space from the component next to it */
+  flex-basis: 50%; /* Adjust as needed when combined with other components */
+  min-width: 400px; /* Minimum width to prevent shrinking too much */
+}
+
+.traffic-line-graph-card .card-title-header {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--graph-header-text);
+  margin: 0 0 20px 0; /* Space below the header */
+}
+
+.graph-controls {
+  display: flex;
+  justify-content: flex-end; /* Align to the right */
+  margin-bottom: 20px;
+  gap: 5px; /* Space between buttons */
+}
+
+.graph-control-button {
+  padding: 6px 12px;
+  border: 1px solid var(--graph-control-border);
+  border-radius: 6px;
+  background-color: var(--graph-control-bg);
+  color: var(--graph-control-text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.graph-control-button:hover {
+  background-color: #e0e0e0;
+}
+
+.graph-control-button.active {
+  background-color: var(--graph-control-active-bg);
+  color: var(--graph-control-active-text);
+  border-color: var(--graph-control-active-bg);
+}
+
+/* Ensure ResponsiveContainer works */
+.recharts-wrapper {
+  overflow: visible !important; /* Prevent cutting off tooltips */
+}

@@ -1,0 +1,139 @@
+/* --- Base styles and Log Item styles remain the same --- */
+
+.log-viewer-container {
+    padding: 30px;
+    background-color: white; 
+    color: #333; 
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+}
+
+.log-viewer-header h1 {
+    font-size: 2.2em;
+    color: #007bff; 
+    margin-bottom: 5px;
+}
+
+/* ... other header styles ... */
+
+.log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+}
+
+.log-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    background-color: #f8f9fa; 
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
+    transition: transform 0.2s;
+}
+
+.log-item:hover {
+    transform: translateY(-2px); 
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.log-message-section {
+    flex-grow: 1;
+}
+
+.log-message {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 8px;
+}
+
+.log-details {
+    display: flex;
+    gap: 25px;
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+.detail-item {
+    /* CRITICAL: Must be flex to align children (text and icon) */
+    display: flex; 
+    align-items: center; /* Vertically centers all children elements */
+    /* Ensure no wrapping happens */
+    white-space: nowrap; 
+}
+
+.tx-hash-display {
+    color: #343a40; 
+    cursor: default;
+    /* Reset any default element spacing */
+    line-height: 1.2; 
+}
+
+/* New element added for structural integrity (TxHash text) */
+.tx-hash-value {
+    /* Ensures the text part takes the space it needs */
+    display: inline-block;
+    /* Use line-height to ensure the text itself is well-aligned */
+    line-height: 1.2; 
+}
+
+/* 📋 Final Copy Icon Styling 📋 */
+.copy-icon {
+    /* Use margin to separate from the text */
+    margin-left: 6px; 
+    font-size: 1em; 
+    cursor: pointer;
+    transition: transform 0.1s;
+    
+    /* CRITICAL: Setting explicit size and display for consistent centering */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px; /* Explicit width for icon container */
+    height: 16px; /* Explicit height */
+    
+    /* Force the emoji to sit nicely on the same baseline */
+    margin-bottom: -1px; 
+}
+
+.copy-icon:hover {
+    transform: scale(1.1); 
+}
+
+/* --- Property ID and Censored Tags remain the same --- */
+
+.log-property-section {
+    flex-shrink: 0;
+    margin-left: 20px;
+}
+
+.property-tag {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap; 
+}
+
+.property-tag.uncensored {
+    background-color: #d1e7dd; 
+    color: #0f5132; 
+    border: 1px solid #badbcc;
+}
+
+.property-tag.censored {
+    background-color: #f8d7da; 
+    color: #842029; 
+    border: 1px solid #f5c2c7;
+}
+
+.no-logs {
+    text-align: center;
+    color: #6c757d;
+    padding: 40px;
+    font-size: 1.2em;
+}

@@ -1,0 +1,56 @@
+/* --- CSS Variables for Details Component --- */
+:root {
+  --detail-title-color: #212529;
+  --detail-label-color: #6c757d;
+  --detail-value-color: #343a40;
+}
+
+.details-container {
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+.details-section {
+  margin-bottom: 24px;
+}
+
+.details-section:last-child {
+  margin-bottom: 0;
+}
+
+.details-title {
+  /* --- FIX: Reduced font size --- */
+  font-size: 1.15rem; /* Was 1.3rem */
+  font-weight: 600;
+  color: var(--detail-title-color);
+  margin: 0 0 16px 0;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-label {
+  /* --- FIX: Reduced font size --- */
+  font-size: 0.8rem; /* Was 0.85rem */
+  font-weight: 500;
+  color: var(--detail-label-color);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  /* --- FIX: Reduced font size --- */
+  font-size: 0.95rem; /* Was 1rem */
+  font-weight: 600;
+  color: var(--detail-value-color);
+}

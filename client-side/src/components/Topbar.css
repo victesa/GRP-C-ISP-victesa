@@ -1,0 +1,189 @@
+/* --- CSS Variables for Topbar --- */
+:root {
+  --topbar-bg: #ffffff;
+  --topbar-border: #e0e0e0;
+  --topbar-text: #212529;
+  --topbar-icon-bg: #f8f9fa;
+  --topbar-icon-border: #e0e0e0;
+  --topbar-search-text: #6c757d;
+  --logo-icon-bg: #1abc9c; /* Teal color */
+  --notification-badge-bg: #e63946; /* Red */
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 30px;
+  height: 65px;
+  width: 100%;
+  background-color: var(--topbar-bg);
+  border-bottom: 1px solid var(--topbar-border);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.topbar-spacer {
+  flex-grow: 1;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.topbar-advocate-btn {
+  background-color: var(--logo-icon-bg);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.topbar-advocate-btn:hover {
+  filter: brightness(1.1);
+}
+
+.topbar-advocate-btn.pending {
+  background-color: var(--topbar-icon-bg);
+  color: var(--topbar-search-text);
+  cursor: not-allowed;
+  filter: none;
+}
+
+/* --- Notification Button & Badge --- */
+.topbar-notification-wrapper {
+  position: relative; /* Container for the dropdown */
+}
+
+.topbar-icon-button {
+  position: relative; /* Container for the badge */
+  background: var(--topbar-icon-bg);
+  border: 1px solid var(--topbar-icon-border);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.topbar-icon-button:hover {
+  background-color: #e9ecef;
+}
+
+.topbar-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.topbar-notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -2px;
+  background-color: var(--notification-badge-bg);
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--topbar-bg);
+}
+
+/* --- Avatar --- */
+.topbar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  object-fit: cover;
+}
+
+/* --- Notification Dropdown --- */
+.notification-dropdown {
+  position: absolute;
+  top: calc(100% + 15px); /* Position below the button with a gap */
+  right: 0;
+  width: 350px;
+  background-color: #ffffff;
+  border: 1px solid var(--topbar-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  overflow: hidden; /* To keep the rounded corners */
+}
+
+.notification-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--topbar-border);
+}
+.notification-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--topbar-text);
+}
+
+.notification-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.notification-item:last-child {
+  border-bottom: none;
+}
+.notification-item:hover {
+  background-color: #f8f9fa;
+}
+
+.notification-item p {
+  margin: 0 0 4px 0;
+  font-size: 0.95rem;
+  color: var(--topbar-text);
+  line-height: 1.4;
+}
+
+.notification-time {
+  font-size: 0.8rem;
+  color: var(--topbar-search-text);
+}
+
+.notification-item.empty p {
+  text-align: center;
+  color: var(--topbar-search-text);
+  padding: 20px 0;
+}
+
+
+/* --- NEW: Profile Wrapper --- */
+.topbar-profile-wrapper {
+  position: relative; /* Container for the dropdown */
+}
+
+/* --- NEW: Sign Out Button Style --- */
+.notification-item.sign-out-item {
+  color: var(--notification-badge-bg); /* Use the red from the badge */
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.notification-item.sign-out-item:hover {
+  background-color: #fff0f0; /* A light red hover */
+  color: #d9534f; /* A slightly darker red */
+}

@@ -1,0 +1,230 @@
+/* --- CSS Variables (using our theme) --- */
+:root {
+  --card-bg: #ffffff;
+  --card-border: #e0e0e0;
+  --card-shadow: rgba(0, 0, 0, 0.05);
+  --header-text: #212529;
+  --table-header-text: #6c757d;
+  --table-row-text: #495057;
+  --table-border: #f0f0f0;
+  --input-bg: #ffffff;
+  --input-border: #ced4da;
+  --theme-color: #1abc9c; /* Teal theme */
+  --button-approve-bg: #e0f8f3;
+  --button-approve-text: #1abc9c;
+  --button-reject-bg: #fff0f0;
+  --button-reject-text: #d9534f;
+  --button-suspend-bg: #fff4e6;
+  --button-suspend-text: #f39c12;
+  --button-view-bg: #f8f9fa;
+  --button-view-border: #ced4da;
+  --button-view-text: #495057;
+}
+
+.advocate-management-page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Page Header */
+.advocate-management-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.advocate-management-page .page-header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--header-text);
+  margin: 0;
+}
+
+/* --- NEW: Tab Navigation --- */
+.admin-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 2px solid var(--card-border);
+  margin-bottom: 24px;
+}
+.admin-tab {
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--table-header-text);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  margin-bottom: -2px; /* Pulls tab down to the line */
+  transition: color 0.2s, border-color 0.2s;
+}
+.admin-tab:hover {
+  color: var(--header-text);
+}
+.admin-tab.active {
+  color: var(--theme-color);
+  border-bottom-color: var(--theme-color);
+}
+/* --- END: Tab Navigation --- */
+
+
+/* Card for content */
+.admin-content-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 12px var(--card-shadow);
+  margin-bottom: 30px; /* Space between cards */
+}
+
+/* --- NEW: Card Subtitle --- */
+.card-subtitle {
+  font-size: 0.9rem;
+  color: var(--table-header-text);
+  margin-top: -20px; /* Pulls it up under the title */
+  margin-bottom: 25px;
+}
+
+.card-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--header-text);
+  margin: 0 0 25px 0;
+}
+
+.card-header-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+.card-header-controls .card-title {
+  margin-bottom: 0;
+}
+
+.admin-search-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-width: 300px;
+}
+.admin-search-bar .search-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  opacity: 0.6;
+}
+.admin-search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.9rem;
+  color: var(--table-row-text);
+  width: 100%;
+}
+.admin-search-bar input::placeholder {
+  color: var(--table-header-text);
+}
+
+/* Table styles */
+.admin-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--table-border);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+th {
+  color: var(--table-header-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+td {
+  color: var(--table-row-text);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.cell-name {
+  color: var(--header-text);
+  font-weight: 600;
+}
+
+/* --- NEW: Empty Table Cell --- */
+.empty-table-cell {
+  text-align: center;
+  color: var(--table-header-text);
+  padding: 40px;
+  font-style: italic;
+}
+
+/* --- Action Button Styles --- */
+.actions-cell {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.action-btn.view-details {
+  background-color: var(--button-view-bg);
+  border-color: var(--button-view-border);
+  color: var(--button-view-text);
+}
+.action-btn.view-details:hover {
+  background-color: #e9ecef;
+}
+
+.action-btn.approve {
+  background-color: var(--button-approve-bg);
+  color: var(--button-approve-text);
+}
+.action-btn.approve:hover {
+  background-color: #cbf1e7;
+}
+
+.action-btn.reject {
+  background-color: var(--button-reject-bg);
+  color: var(--button-reject-text);
+}
+.action-btn.reject:hover {
+  background-color: #ffe8e8;
+}
+
+.action-btn.suspend {
+  background-color: var(--button-suspend-bg);
+  color: var(--button-suspend-text);
+}
+.action-btn.suspend:hover {
+  background-color: #fde8c8;
+}

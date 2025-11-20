@@ -1,0 +1,152 @@
+/* --- CSS Variables for Stage Card --- */
+:root {
+  --stage-card-bg: #ffffff;
+  --stage-card-border: #e0e0e0;
+  --stage-card-shadow: rgba(0, 0, 0, 0.05);
+  --text-dark: #212529;
+  --text-muted: #6c757d;
+  --button-reject-bg: #f8f9fa;
+  --button-reject-border: #ced4da;
+  --button-reject-text: #495057;
+  --button-reject-hover: #e9ecef;
+  --button-accept-bg: #1abc9c; /* Our teal theme */
+  --button-accept-hover: #16a085;
+  --button-accept-text: #ffffff;
+}
+
+.stage-card {
+  background-color: var(--stage-card-bg);
+  border: 1px solid var(--stage-card-border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px var(--stage-card-shadow);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+.stage-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0 0 12px 0;
+}
+
+.stage-description {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+}
+
+.stage-description strong {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+/* --- Action Buttons --- */
+.stage-actions {
+  display: flex;
+  justify-content: flex-end; /* Aligns buttons to the right */
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--stage-card-border);
+}
+
+.stage-button {
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stage-button img {
+  width: 14px;
+  height: 14px;
+}
+
+.button-reject {
+  background-color: var(--button-reject-bg);
+  border: 1px solid var(--button-reject-border);
+  color: var(--button-reject-text);
+}
+.button-reject:hover {
+  background-color: var(--button-reject-hover);
+}
+
+.button-accept {
+  background-color: var(--button-accept-bg);
+  border: 1px solid var(--button-accept-bg);
+  color: var(--button-accept-text);
+}
+.button-accept:hover {
+  background-color: var(--button-accept-hover);
+}
+
+/* --- Waiting State (Buyer/Seller) --- */
+.stage-waiting {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.stage-waiting span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.loading-icon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+  /* Add animation if it's a spinner */
+  /* animation: spin 1s linear infinite; */
+}
+
+/* ---
+--- NEW CSS FOR ADVOCATE VIEW ---
+--- */
+.stage-waiting-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--stage-card-border);
+}
+
+.stage-waiting-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.stage-waiting-item img {
+  width: 18px;
+  height: 18px;
+}
+
+.stage-waiting-item span {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* --- Error Message --- */
+.stage-error {
+  color: #dc3545;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: right;
+  margin: 12px 0 -12px 0; /* Position below buttons */
+}

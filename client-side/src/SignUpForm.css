@@ -1,0 +1,285 @@
+:root {
+    --primary-color: #191C36;
+    --secondary-color: #191C36;
+    --wallet-color: #007bff;
+    --install-color: #ffc107; /* Yellow for install button */
+    --light-gray: #f4f4f4;
+    --border-gray: #ccc;
+    --text-color: #333;
+}
+
+/* Base Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.register-page {
+    font-family: sans-serif;
+    background-color: #fff;
+    color: var(--text-color);
+    min-height: 100vh;
+    width: 100vw;
+}
+
+/* Header Styling */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 50px;
+    border-bottom: 1px solid var(--light-gray);
+    height: 70px;
+}
+
+.header-logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-ecitizen {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #191C36;
+}
+
+.header-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.icon {
+    font-size: 1.2em;
+    cursor: pointer;
+    color: var(--secondary-color);
+}
+
+/* Main Content and Form Container */
+.main-content {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.registration-container {
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.title {
+    font-size: 2em;
+    font-weight: 400;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    margin-bottom: 30px;
+    color: var(--text-color);
+}
+
+/* Progress Stepper */
+.progress-stepper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    color: var(--border-gray);
+    min-width: 80px;
+}
+
+.circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--border-gray);
+    background-color: white;
+    margin-bottom: 5px;
+    z-index: 10;
+}
+
+.step.active .circle {
+    border-color: var(--primary-color);
+    background-color: white;
+    box-shadow: 0 0 0 2px var(--primary-color), inset 0 0 0 5px var(--primary-color);
+}
+
+.step.active .label {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.line {
+    flex-grow: 1;
+    height: 1px;
+    background-color: var(--border-gray);
+    margin: 0 -10px;
+}
+
+/* Form Styling */
+.registration-form {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.required {
+    color: red;
+    font-weight: bold;
+}
+
+.registration-form input[type="text"],
+.registration-form input[type="email"],
+.registration-form input[type="tel"],
+.registration-form input[type="password"],
+.registration-form select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid var(--border-gray);
+    border-radius: 4px;
+    font-size: 1em;
+    height: 45px;
+    transition: border-color 0.3s;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: white;
+    color: #1f2937;
+}
+
+.registration-form select {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="gray" d="M7.247 11.14L2.451 5.658h9.592L7.247 11.14z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 10px;
+}
+
+
+.registration-form input:focus,
+.registration-form select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* Error Styling */
+.error-message {
+    color: #cc0000;
+    font-size: 0.8em;
+    margin-top: 4px;
+}
+.firebase-error {
+    color: #cc0000;
+    background-color: #fce8e8;
+    border: 1px solid #cc0000;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+
+/* Form Actions and Buttons */
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1em;
+    transition: background-color 0.3s;
+    width: 100%;
+}
+
+.form-actions .btn {
+    flex: 1;
+}
+
+.btn-back {
+    background-color: var(--light-gray);
+    color: var(--text-color);
+    border: 1px solid var(--border-gray);
+}
+
+.btn-back:hover {
+    background-color: #e0e0e0;
+}
+
+.btn-next,
+.btn-submit {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-next:hover,
+.btn-submit:hover {
+    background-color: #191C36; 
+}
+
+/* --- ADDED FOR WALLET BUTTON --- */
+.btn-wallet {
+    background-color: var(--wallet-color);
+    color: white;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+}
+.btn-wallet:hover {
+    background-color: #0056b3;
+}
+.btn-wallet.connected {
+    background-color: #28a745;
+    cursor: default;
+}
+.btn-wallet.connected:hover {
+    background-color: #218838;
+}
+
+/* --- ADDED FOR INSTALL BUTTON --- */
+.btn-install {
+    background-color: var(--install-color);
+    color: #333;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    display: block; /* Make <a> tag look like a button */
+}
+.btn-install:hover {
+    background-color: #e0a800;
+}

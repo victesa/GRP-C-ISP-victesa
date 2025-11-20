@@ -1,0 +1,142 @@
+/* --- CSS Variables (using our teal theme) --- */
+:root {
+  --page-text: #212529;
+  --page-text-muted: #adb5bd; /* Lighter gray for pending text */
+  --card-bg: #ffffff;
+  --card-border: #e0e0e0;
+  --card-shadow: rgba(0, 0, 0, 0.05);
+  --active-color: #191C36; /* Our teal theme color */
+  --pending-color: #f1f3f5; /* Very light gray for pending bar */
+  --icon-border: #adb5bd;
+}
+
+.deal-header-container {
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+/* 3. Stages Card */
+.stages-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px var(--card-shadow);
+}
+
+.stages-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.stages-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--page-text);
+  margin: 0;
+}
+
+.move-stage-btn {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--page-text);
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+.move-stage-btn:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 4. Corrected Stepper Component */
+.stepper-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* --- Stepper Top Row (Icons + Labels) --- */
+.stepper-stages-row {
+  display: flex;
+  width: 100%;
+}
+
+.stage-item {
+  flex: 1; 
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* --- FIX: Correct alignment --- */
+.stage-item[data-align="start"] { justify-content: flex-start; }
+.stage-item[data-align="end"] { justify-content: flex-end; }
+
+.step-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+.step-icon img {
+  width: 12px;
+  height: 12px;
+}
+
+.step-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s;
+  color: var(--page-text);
+}
+
+/* --- Stepper States (Icons + Labels) --- */
+.stage-item[data-state="completed"] .step-icon {
+  background-color: var(--active-color);
+  border: 1px solid var(--active-color);
+}
+.stage-item[data-state="current"] .step-icon {
+  background-color: #ffffff;
+  border: 2px solid var(--icon-border);
+}
+.stage-item[data-state="pending"] .step-label {
+  color: var(--page-text-muted);
+}
+
+/* --- Stepper Bottom Row (Progress Bar) --- */
+.stepper-bar-row {
+  display: flex;
+  width: 100%;
+  margin-top: 8px;
+  gap: 4px;
+}
+
+.bar-segment {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+}
+
+/* --- Stepper States (Progress Bar) --- */
+.bar-segment[data-state="completed"] {
+  background-color: var(--active-color);
+}
+.bar-segment[data-state="current"] {
+  background: linear-gradient(
+    to right, 
+    var(--active-color) 50%, 
+    var(--pending-color) 50%
+  );
+}
+.bar-segment[data-state="pending"] {
+  background-color: var(--pending-color);
+}

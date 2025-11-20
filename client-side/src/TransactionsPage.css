@@ -1,0 +1,50 @@
+/*
+  This container class is optional, but good for scoping.
+  The main padding is handled by the .app-content class in Layout.css.
+*/
+.transactions-page-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Styles for the "Transactions" title and actions row */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px; /* Space between title and summary cards */
+}
+
+.page-header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #212529; /* Dark text */
+  margin: 0;
+}
+
+.page-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Example style for a page-specific action button */
+.page-action-button {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.page-action-button:hover {
+  background-color: #f8f9fa;
+}
+
+.page-action-button img {
+  width: 18px;
+  height: 18px;
+}

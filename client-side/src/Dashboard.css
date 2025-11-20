@@ -1,0 +1,161 @@
+/* --- Dashboard Specific CSS Variables --- */
+:root {
+  --page-bg: #f8f9fa; /* Very light gray/almost white for the main page */
+  --dashboard-header-text: #212529; /* Dark text for "Good Morning" */
+  --dashboard-card-bg: #ffffff; /* White card background */
+  --dashboard-card-border: #e0e0e0; /* Light border for cards */
+  --dashboard-card-shadow: rgba(0, 0, 0, 0.05); /* Subtle shadow */
+  --dashboard-metric-color: #212529; /* Dark color for the big numbers */
+  --dashboard-title-color: #495057; /* Slightly lighter dark for card titles */
+  --dashboard-description-color: #6c757d; /* Muted gray for descriptions */
+  --dashboard-control-bg: #e9ecef; /* Light gray for buttons/select */
+  --dashboard-control-border: #ced4da; /* Border for buttons/select */
+  --dashboard-control-text: #495057; /* Text for buttons/select */
+  
+  /* Using the teal theme color from sidebar */
+  --dashboard-icon-bg: rgba(26, 188, 156, 0.1); 
+  --dashboard-icon-color: #1abc9c;
+}
+
+/* Base styles for the entire dashboard page */
+.dashboard-page-container {
+  background-color: var(--page-bg);
+  min-height: 100vh; /* Ensure it covers full height */
+  padding: 10px 30px; /* Padding around the content */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Header section (Good Morning, Alexa!) */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.dashboard-header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--dashboard-header-text);
+  margin: 0;
+}
+
+.header-controls {
+  display: flex;
+  gap: 10px; /* Space between select and button */
+}
+
+.control-select,
+.control-button {
+  padding: 8px 15px;
+  border: 1px solid var(--dashboard-control-border);
+  border-radius: 6px;
+  background-color: var(--dashboard-card-bg); /* Match card bg */
+  color: var(--dashboard-control-text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  -webkit-appearance: none; 
+  -moz-appearance: none;
+  appearance: none; 
+  position: relative;
+}
+
+.control-select {
+  padding-right: 30px; /* Make space for custom arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c757d'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); /* Custom SVG arrow */
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+.control-select:hover,
+.control-button:hover {
+  background-color: var(--dashboard-control-bg);
+}
+
+/* Cards Grid (Top row of cards) */
+.dashboard-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive columns */
+  gap: 20px; /* Space between cards */
+  margin-bottom: 30px; /* Space between top and bottom sections */
+}
+
+/* Individual Dashboard Card */
+.dashboard-card {
+  background-color: var(--dashboard-card-bg);
+  border: 1px solid var(--dashboard-card-border);
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 12px var(--dashboard-card-shadow);
+  transition: transform 0.2s ease-in-out;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px); /* Subtle lift effect on hover */
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* Align metric and icon at top */
+  margin-bottom: 20px;
+}
+
+.card-metric {
+  font-size: 3rem; /* Large number */
+  font-weight: 700;
+  color: var(--dashboard-metric-color);
+  line-height: 1; /* Adjust line height for better spacing */
+}
+
+.dashboard-icon-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: var(--dashboard-icon-bg); /* Light teal tint */
+  border-radius: 50%; /* Circular background */
+  color: var(--dashboard-icon-color); /* Bright teal icon color */
+  font-size: 1.5rem; /* Icon size */
+  font-weight: normal; /* Override potential bold from emoji */
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.dashboard-icon-placeholder:hover {
+  background-color: var(--dashboard-icon-color);
+  color: var(--sidebar-text-active); /* White icon on hover */
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--dashboard-title-color);
+  margin: 0 0 8px 0;
+}
+
+.card-description {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--dashboard-description-color);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Layout for the graph and review tasks */
+.dashboard-secondary-grid {
+  display: flex; /* This makes children horizontal */
+  gap: 20px; /* Space between the graph and the review card */
+  margin-bottom: 30px; /* Space below this section */
+}
+
+/* Ensure the cards within the secondary grid share the space */
+.dashboard-secondary-grid .traffic-line-graph-card,
+.dashboard-secondary-grid .review-tasks-card {
+    flex: 1; /* This shorthand (flex-grow: 1, flex-shrink: 1, flex-basis: 0%) 
+               tells them to share the space equally. */
+}

@@ -1,0 +1,121 @@
+/* --- CSS Variables for this component (inheriting from dashboard/layout) --- */
+:root {
+  --review-card-bg: #ffffff; /* White card background */
+  --review-card-border: #e0e0e0; /* Light border */
+  --review-card-shadow: rgba(0, 0, 0, 0.05); /* Subtle shadow */
+  --review-header-text: #212529; /* Dark text for 'To review' */
+  --table-header-text: #6c757d; /* Muted gray for table headers */
+  --table-row-text: #495057; /* Darker gray for row content */
+  --table-row-border: #f0f0f0; /* Very light gray line between rows */
+  --icon-color-check: #28a745; /* Green for checkmark */
+  --icon-color-flag-blue: #007bff; /* Blue for flag */
+  --icon-color-flag-red: #dc3545; /* Red for flag */
+  --icon-color-calendar: #6c757d; /* Muted gray for calendar */
+}
+
+.review-tasks-card {
+  background-color: var(--review-card-bg);
+  border: 1px solid var(--review-card-border);
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 12px var(--review-card-shadow);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  margin-right: 20px; /* Space from the component next to it */
+  flex-basis: 50%; /* Adjust as needed when combined with other components */
+  min-width: 400px; /* Minimum width to prevent shrinking too much */
+}
+
+.card-title-header {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--review-header-text);
+  margin: 0 0 25px 0; /* Space below the header */
+}
+
+.tasks-table {
+  width: 100%;
+}
+
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr; /* Adjust column widths as needed */
+  align-items: center;
+  padding: 12px 0; /* Vertical padding */
+  border-bottom: 1px solid var(--table-row-border); /* Line between rows */
+}
+
+.table-header {
+  font-weight: 500;
+  color: var(--table-header-text);
+  font-size: 0.9rem;
+  padding-bottom: 15px; /* More space below header */
+  border-bottom: none; /* No line under the main header */
+}
+
+.table-header .header-item {
+  text-align: left;
+}
+
+.table-body .table-row:last-child {
+  border-bottom: none; /* No border for the last row */
+}
+
+.table-row {
+  font-size: 0.85rem;
+  color: var(--table-row-text);
+}
+
+.row-item {
+  display: flex; /* For icons to sit nicely next to text */
+  align-items: center;
+  white-space: nowrap; /* Prevent text wrapping for project names/dates */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Add ellipsis if content is too long */
+}
+
+.name-col {
+  font-weight: 600; /* Task name is a bit bolder */
+  color: var(--review-header-text); /* Darker for names */
+}
+
+.icon-small {
+  margin-right: 6px; /* Space between icon and text */
+  font-size: 1rem;
+  line-height: 1; /* Ensure icon aligns vertically */
+}
+
+/* Specific icon coloring (if not using an actual icon library with custom colors) */
+.row-item .icon-small:first-child {
+  /* This targets the checkmark specifically if it's the first icon */
+  color: var(--icon-color-check);
+}
+.row-item span.icon-small:nth-child(2) {
+  /* This targets flags if they are the second icon */
+  color: var(--icon-color-flag-blue); /* Default for blue flag */
+}
+.row-item span.icon-small:nth-child(3) {
+  /* This targets flags if they are the third icon */
+  color: var(--icon-color-flag-red); /* Default for red flag */
+}
+
+/* Override for specific flags */
+.row-item .icon-small[children='📘'] {
+    color: var(--icon-color-flag-blue);
+}
+.row-item .icon-small[children='🚩'] {
+    color: var(--icon-color-flag-red);
+}
+.row-item .icon-small[children='🗓️'] {
+    color: var(--icon-color-calendar);
+    margin-right: 8px; /* Slightly more space for calendar icon */
+}
+
+/* Adjust column widths if needed, e.g., for specific text lengths */
+.projects-col {
+  max-width: 150px; /* Example: constrain width */
+}
+.date-col {
+  max-width: 120px; /* Example: constrain width */
+}

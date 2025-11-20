@@ -1,0 +1,21 @@
+/* Reuses styles from StageMultiSignature.css for card, titles, buttons */
+@import url('./StageMultiSignature.css');
+
+.stage-finalized-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center-align all content */
+  text-align: center;
+}
+
+.finalized-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  color: var(--button-accept-bg); /* Use theme color */
+}
+
+/* Center the action button(s) */
+.stage-finalized-card .stage-actions {
+  justify-content: center;
+}

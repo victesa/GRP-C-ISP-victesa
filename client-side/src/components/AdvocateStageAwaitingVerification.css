@@ -1,0 +1,61 @@
+.awaiting-verification-container {
+  padding: 20px;
+}
+
+.awaiting-verification-container h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.awaiting-verification-container p {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 24px;
+}
+
+.verification-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.verification-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.verification-icon {
+  width: 28px;
+  height: 28px;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.verification-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.party-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.party-status {
+  font-size: 0.85rem;
+}
+
+.party-status.pending {
+  color: #777;
+}
+
+.party-status.verified {
+  color: #008000;
+  font-weight: 500;
+}
