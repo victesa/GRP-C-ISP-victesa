@@ -8,16 +8,15 @@ import { useAuth } from './hooks/useAuth';
 import DealHeader from './components/DealHeader';
 import DealSidebar from './components/DealSidebar'; 
 import TransactionDetails from './components/TransactionDetails'; 
+import PropertyHistoryCard from './components/PropertyHistoryCard'; 
 
 // Interactive Stage Components
 import StageMultiSignature from './components/StageMultiSignature';
 import StageDocsShared from './components/StageDocsShared'; 
 import StageWaitingForDocs from './components/StageWaitingForDocs'; 
-
-// --- NEW COMPONENT IMPORT ---
 import SellerApprovalCard from './components/SellerApprovalCard'; 
 
-// --- Final Stages (Placeholders) ---
+// Final Stages
 import StageVerified from './components/StageVerified'; 
 import StageUnderReview from './components/StageUnderReview'; 
 import StageFinalized from './components/StageFinalized'; 
@@ -44,11 +43,7 @@ const TransactionDetailPage = () => {
       if (docSnap.exists()) {
         const data = { id: docSnap.id, ...docSnap.data() };
         setTransaction(data);
-        
-        // --- *** FIX: Corrected console.log() to print the entire object *** ---
         console.log("Transaction Data:", data);
-        // ---
-        
       } else {
         console.error("Transaction not found!");
         setTransaction(null);
@@ -63,7 +58,7 @@ const TransactionDetailPage = () => {
     
   }, [transactionId, currentUser]); 
 
-  // --- This function now ONLY renders the *interactive* part of a stage ---
+  // --- Stage Logic ---
   const renderStageContent = () => {
     if (!transaction || !currentUser) return null;
 
@@ -72,31 +67,18 @@ const TransactionDetailPage = () => {
     const isUserBuyer = currentUser.uid === transaction.buyer?.uid;
 
     switch (currentStatus) {
-      
       case 'awaiting signatures': 
         return <StageMultiSignature transaction={transaction} />;
         
       case 'docs shared':
-        // User is waiting for the advocate to upload files
         return <StageWaitingForDocs transaction={transaction} />; 
 
       case 'awaiting verification':
-        // User must verify the docs shared by the advocate
         return <StageDocsShared transaction={transaction} />; 
       
-      // --- FINAL APPROVAL LOGIC ---
       case 'under review':
-        // If the status is "Under Review" AND the user is the Seller, show the final approval button.
-        if (isUserSeller) {
-            return <SellerApprovalCard transaction={transaction} />;
-        }
-        // If the status is "Under Review" AND the user is the Buyer, they wait.
-        if (isUserBuyer) {
-            return <div className="stage-card"><h3>Awaiting Final Transfer</h3><p>The Land Official is reviewing the documents and awaiting final transfer approval from the Seller.</p></div>;
-        }
-        // Fallback for anyone else
+        
         return <StageUnderReview transaction={transaction} />;
-
 
       case 'verified':
         return <StageVerified transaction={transaction} />;
@@ -128,6 +110,17 @@ const TransactionDetailPage = () => {
   }
   
   const stageComponent = renderStageContent();
+  const currentStatus = (transaction.status || '').toLowerCase();
+
+  // Define which stages allow the history card
+  const stagesWithHistory = [
+    'docs shared', 
+    'awaiting verification', 
+    'under review', 
+    'verified', 
+    'finalized'
+  ];
+  const showHistory = stagesWithHistory.includes(currentStatus);
 
   return (
     <div className="transaction-detail-container">
@@ -136,12 +129,21 @@ const TransactionDetailPage = () => {
       <div className="detail-main-content">
         <DealHeader currentStage={transaction.status} />
         
-        {/* --- Card 1 contains ONLY TransactionDetails --- */}
+        {/* --- Card 1: Transaction Details --- */}
         <div className="tab-content-container">
           <TransactionDetails transaction={transaction} />
         </div>
+
+        {/* --- Card 2: Property History (Conditional) --- */}
+        {showHistory && (
+           <PropertyHistoryCard 
+              propertyId={transaction.propertyId || transaction.id}
+              parcelNumber={transaction.parcelNumber || transaction.titleNumber || "Unknown Parcel"}
+              location={transaction.location || "Unknown Location"}
+           />
+        )}
         
-        {/* --- Conditionally render Card 2 (for the stage) BELOW Card 1 --- */}
+        {/* --- Card 3: Interactive Stage Component --- */}
         {stageComponent && (
           <div className="tab-content-container">
             {stageComponent}

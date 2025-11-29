@@ -23,47 +23,56 @@ const UserTransactionSummary = () => {
 
     const { uid } = currentUser;
 
-    // --- FIX: Updated queries to use the dot notation for the maps ---
+    // Query for buyer transactions
     const q1 = query(collection(db, "transactions"), where("buyer.uid", "==", uid));
     const q2 = query(collection(db, "transactions"), where("seller.uid", "==", uid));
 
     const unsub1 = onSnapshot(q1, (snap1) => {
-        console.error("ddd", q1)
-      setBuyerTxs(snap1.docs.map(doc => doc.data()));
-    }, (err) => console.error("Error fetching buyer txs:", err)); // Added error logging
+      // FIX 1: Include the doc.id in the object
+      setBuyerTxs(snap1.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (err) => console.error("Error fetching buyer txs:", err));
     
     const unsub2 = onSnapshot(q2, (snap2) => {
-      setSellerTxs(snap2.docs.map(doc => doc.data()));
-    }, (err) => console.error("Error fetching seller txs:", err)); // Added error logging
+      // FIX 1: Include the doc.id in the object
+      setSellerTxs(snap2.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (err) => console.error("Error fetching seller txs:", err));
 
-    // Return a function that unsubscribes from both
     return () => {
       unsub1();
       unsub2();
     };
   }, [currentUser]);
 
-  // Use useMemo to calculate counts only when data changes
+  // Calculate counts only when data changes
   const [activeCount, historyCount] = useMemo(() => {
-    // Combine results and use a Map to de-duplicate
+    // Combine results and use a Map to de-duplicate based on ID
     const allTransactionsMap = new Map();
-    // We can use parcelNumber as a key assuming it's unique per transaction
-    buyerTxs.forEach(tx => allTransactionsMap.set(tx.parcelNumber, tx)); 
-    sellerTxs.forEach(tx => allTransactionsMap.set(tx.parcelNumber, tx));
+    
+    // FIX 2: Use tx.id as the unique key, NOT parcelNumber
+    // This allows multiple transactions for the same land to be counted accurately
+    buyerTxs.forEach(tx => allTransactionsMap.set(tx.id, tx)); 
+    sellerTxs.forEach(tx => allTransactionsMap.set(tx.id, tx));
 
     const allTransactions = Array.from(allTransactionsMap.values());
 
-    // Filter them in JavaScript
+    // Active: exclude Finalized, Rejected, and Cancelled
     const active = allTransactions.filter(
-      tx => tx.status !== 'Finalized' && tx.status !== 'Rejected'
+      tx => tx.status !== 'Finalized' && 
+            tx.status !== 'Rejected' && 
+            tx.status !== 'Cancelled' &&
+            tx.status !== 'Documents Rejected'
     ).length;
     
+    // History: include Finalized, Rejected, and Cancelled
     const history = allTransactions.filter(
-      tx => tx.status === 'Finalized' || tx.status === 'Rejected'
+      tx => tx.status === 'Finalized' || 
+            tx.status === 'Rejected' || 
+            tx.status === 'Cancelled' ||
+            tx.status === 'Documents Rejected'
     ).length;
 
     return [active, history];
-  }, [buyerTxs, sellerTxs]); // Only recalculate when buyerTxs or sellerTxs changes
+  }, [buyerTxs, sellerTxs]);
 
   return (
     <div className="summary-card-container">
@@ -82,7 +91,7 @@ const UserTransactionSummary = () => {
           <CardIcon type="info" />
         </div>
         <p className="card-value">{historyCount}</p>
-        <p className="card-subtitle">Total finalized deals</p>
+        <p className="card-subtitle">Finalized, rejected, or cancelled</p>
       </div>
     </div>
   );

@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import './PropertyReviewPage.css'; // New CSS file
+import './PropertyReviewPage.css';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db } from './firebaseConfig';
-import { doc, getDoc, collection, addDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { useAuth } from './hooks/useAuth'; // To get admin auth token
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useAuth } from './hooks/useAuth';
 
-import { ethers } from 'ethers'; // --- 1. Import Ethers ---
-import { CONTRACT_ADDRESS, CONTRACT_ABI } from './constants'; // --- 2. Import Contract Constants ---
+import { ethers } from 'ethers';
+import { CONTRACT_ADDRESS, CONTRACT_ABI } from './constants';
 
-// --- IMPORT YOUR ICONS HERE ---
-import docIcon from './assets/icons/file-check.png'; // A generic document icon
+import docIcon from './assets/icons/file-check.png';
 
 // --- Helper components ---
 const DetailItem = ({ label, value }) => (
@@ -37,18 +36,17 @@ const DocumentItem = ({ label, fileUrl }) => (
     )}
   </div>
 );
-// --- End Helper Components ---
-
 
 const PropertyReviewPage = () => {
   const [property, setProperty] = useState(null);
+  const [ownerDetails, setOwnerDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRejecting, setIsRejecting] = useState(false);
   const [comment, setComment] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   
   const { propertyId } = useParams();
-  const { currentUser, userData } = useAuth(); // Get admin data for logging
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
   
   // Fetch property data on component mount
@@ -58,24 +56,41 @@ const PropertyReviewPage = () => {
     const fetchProperty = async () => {
       setIsLoading(true);
       try {
-        // Fetch from 'pendingProperties' collection
         const docRef = doc(db, "pendingProperties", propertyId); 
         const docSnap = await getDoc(docRef);
 
+        let propertyData = null;
+
         if (docSnap.exists()) {
-          setProperty({ id: docSnap.id, ...docSnap.data() });
+          propertyData = { id: docSnap.id, ...docSnap.data() };
         } else {
-          // NEW: Check if it's already approved (for refresh)
           const approvedDocRef = doc(db, "properties", propertyId);
           const approvedDocSnap = await getDoc(approvedDocRef);
           if (approvedDocSnap.exists()) {
-             // It's already approved, just show the details
-             setProperty({ id: approvedDocSnap.id, ...approvedDocSnap.data() });
+            propertyData = { id: approvedDocSnap.id, ...approvedDocSnap.data() };
           } else {
-             console.error("No such property found in pending or approved!");
-             setProperty(null);
+            console.error("No such property found in pending or approved!");
+            setProperty(null);
+            setIsLoading(false);
+            return;
           }
         }
+
+        setProperty(propertyData);
+
+        // Fetch owner details
+        if (propertyData.uid) {
+          const ownerDocRef = doc(db, "users", propertyData.uid);
+          const ownerDocSnap = await getDoc(ownerDocRef);
+          
+          if (ownerDocSnap.exists()) {
+            setOwnerDetails(ownerDocSnap.data());
+          } else {
+            console.warn("Owner user document not found");
+            setOwnerDetails(null);
+          }
+        }
+
       } catch (error) {
         console.error("Error fetching property:", error);
       } finally {
@@ -87,7 +102,7 @@ const PropertyReviewPage = () => {
   }, [propertyId]);
 
   
-  // --- UPDATED handleApprove ---
+  // --- handleApprove with Blockchain Transaction Logging Only ---
   const handleApprove = async () => {
     if (!currentUser || !property) {
       alert("You are not logged in or property data is missing.");
@@ -147,32 +162,26 @@ const PropertyReviewPage = () => {
 
       alert(result.message + "\nPlease confirm the on-chain minting transaction in MetaMask.");
 
-      // We use the parcelNumber as the tokenURI
       const tx = await landContract.registerProperty(ownerWalletAddress, parcelNumber);
       
-      // --- *** NEW: WAIT FOR RECEIPT AND PARSE LOGS *** ---
+      // --- Wait for receipt and parse logs ---
       const receipt = await tx.wait(); 
       const txHash = receipt.hash;
       
       let tokenId = null;
-      // Parse the logs from the receipt to find the PropertyRegistered event
-      // This uses the ABI to understand the event data
       for (const log of receipt.logs) {
         try {
           const parsedLog = landContract.interface.parseLog(log);
           if (parsedLog && parsedLog.name === "PropertyRegistered") {
-            // Found the event! Get the tokenId.
-            // ABI: event PropertyRegistered(uint256 indexed tokenId, ...)
             tokenId = parsedLog.args.tokenId.toString();
-            break; // Stop looping
+            break;
           }
         } catch (e) {
-          // This log wasn't from our contract, ignore
+          // Ignore logs not from our contract
         }
       }
 
       if (tokenId === null) {
-        // This is a critical error
         throw new Error("Minting succeeded but could not parse the tokenId from the event. Please check the contract ABI and event name (PropertyRegistered).");
       }
 
@@ -182,31 +191,68 @@ const PropertyReviewPage = () => {
       const propDocRef = doc(db, "properties", property.id);
       await updateDoc(propDocRef, {
         txHash: txHash,
-        tokenId: tokenId // --- SAVE THE NEW TOKEN ID ---
+        tokenId: tokenId
       });
 
-      // --- STEP 4: Create the log entry (for auditing) ---
-      const adminName = userData?.firstName || currentUser.email;
-      await addDoc(collection(db, "logs"), {
-        message: `Property ${parcelNumber} (Token ID: ${tokenId}) was verified and minted by Admin ${adminName}.`,
-        timestamp: serverTimestamp(),
+      // --- STEP 4: Log the blockchain transaction ---
+      const logPayload = {
+        operation: "property minting",
         txHash: txHash,
-        propertyId: property.id
+        tokenNo: tokenId,
+        advocateUID: "N/A",
+        sellerUID: "N/A",
+        buyerUID: property.uid,
+        propertyId: property.id,
+        status: "success"
+      };
+
+      await fetch('http://localhost:5000/log-transaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify(logPayload)
       });
 
       alert(`Property successfully minted on the blockchain! New Token ID: ${tokenId}`);
-      navigate('/admin/properties'); // Go back to the list
+      navigate('/admin/properties');
 
     } catch (error) {
       console.error("Action failed:", error);
+      
+      // --- Log failed transaction ---
+      try {
+        const failedLogPayload = {
+          operation: "property minting",
+          txHash: "N/A",
+          tokenNo: "N/A",
+          advocateUID: "N/A",
+          sellerUID: "N/A",
+          buyerUID: property.uid,
+          propertyId: property.id,
+          status: "failed"
+        };
+
+        await fetch('http://localhost:5000/log-transaction', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
+          body: JSON.stringify(failedLogPayload)
+        });
+      } catch (logError) {
+        console.error("Failed to log error:", logError);
+      }
+
       alert(`Error: ${error.reason || error.message}`);
     } finally {
       setActionLoading(false);
     }
   };
 
-
-  // --- handleReject (No changes) ---
+  // --- handleReject ---
   const handleReject = async () => {
     if (!currentUser || !property) {
       alert("You are not logged in or property data is missing.");
@@ -249,15 +295,6 @@ const PropertyReviewPage = () => {
         throw new Error(result.error || `Failed to reject property.`);
       }
 
-      // --- Log the rejection action ---
-      const adminName = userData?.firstName || currentUser.email;
-      await addDoc(collection(db, "logs"), {
-        message: `Property ${property.parcelNumber} was rejected by Admin ${adminName}. Reason: ${comment}`,
-        timestamp: serverTimestamp(),
-        txHash: null,
-        propertyId: property.id
-      });
-
       alert('Property rejected successfully.');
       navigate('/admin/properties');
 
@@ -277,6 +314,7 @@ const PropertyReviewPage = () => {
       </div>
     );
   }
+  
   if (!property) {
     return (
       <div className="property-review-page">
@@ -306,10 +344,35 @@ const PropertyReviewPage = () => {
             <div className="detail-grid">
               <DetailItem label="Parcel Number" value={property.parcelNumber} />
               <DetailItem label="Location" value={property.location} />
-              <DetailItem label="Submitted by (User ID)" value={property.uid} /> 
               <DetailItem label="Owner's Wallet" value={property.ownerWalletAddress} />
-              {/* NEW: Show Token ID if it's available */}
               {property.tokenId && <DetailItem label="Token ID" value={property.tokenId} />}
+            </div>
+          </div>
+
+          {/* NEW: Owner Information Section */}
+          <div className="admin-card">
+            <h3 className="admin-card-title">Owner Information</h3>
+            <div className="detail-grid">
+              <DetailItem 
+                label="Full Name" 
+                value={ownerDetails ? `${ownerDetails.firstName || ''} ${ownerDetails.lastName || ''}`.trim() : 'Loading...'} 
+              />
+              <DetailItem 
+                label="Email Address" 
+                value={ownerDetails?.email} 
+              />
+              <DetailItem 
+                label="Phone Number" 
+                value={ownerDetails?.phoneNumber} 
+              />
+              <DetailItem 
+                label="National ID" 
+                value={ownerDetails?.idNumber} 
+              />
+              <DetailItem 
+                label="User ID" 
+                value={property.uid} 
+              />
             </div>
           </div>
           

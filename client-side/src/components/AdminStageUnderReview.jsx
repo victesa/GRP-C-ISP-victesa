@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import './AdminStageUnderReview.css';
 import { useAuth } from '../hooks/useAuth';
-import { doc, updateDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore'; // Import firestore functions
-import { db } from '../firebaseConfig'; // Import db
-import { ethers } from 'ethers'; // Import ethers
-import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../constants'; // Import contract details
+import { ethers } from 'ethers'; 
+import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../constants';
+import { parseContractError } from '../utils/errorParser';
 
 // Import your icons
 import checkIcon from '../assets/icons/help.png';
@@ -12,19 +11,16 @@ import rejectIcon from '../assets/icons/help.png';
 import docIcon from '../assets/icons/help.png';
 
 const AdminStageUnderReview = ({ transaction }) => {
-  const { currentUser, userData } = useAuth(); // Get admin's name from userData
+  const { currentUser } = useAuth(); 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [comment, setComment] = useState('');
   const [showRejectConfirmation, setShowRejectConfirmation] = useState(false);
+  const [statusText, setStatusText] = useState('');
 
   const docList = transaction.advocateDocuments || [];
 
-  // ---
-  // --- *** THIS IS THE NEW LOGIC *** ---
-  // ---
-
-  // REJECT Action
+  // --- REJECT ACTION (WITH BLOCKCHAIN CANCELLATION) ---
   const handleReject = async () => {
     if (!comment.trim()) {
       setError('A comment is required to reject this transaction.');
@@ -32,10 +28,30 @@ const AdminStageUnderReview = ({ transaction }) => {
     }
     setIsLoading(true);
     setError('');
+    setStatusText('Connecting to Wallet...');
 
     try {
       const token = await currentUser.getIdToken();
       
+      // --- STEP 1: Call Smart Contract to Cancel Transaction ---
+      if (!window.ethereum) {
+        throw new Error("MetaMask is not installed.");
+      }
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
+      
+      const landContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      
+      setStatusText('Please sign cancellation in MetaMask...');
+      const tx = await landContract.cancelTransaction(transaction.onChainTxId);
+      
+      setStatusText('Recording cancellation on blockchain...');
+      await tx.wait();
+      console.log("Transaction cancelled on blockchain");
+      
+      // --- STEP 2: Update Backend ---
+      setStatusText('Updating database...');
       const response = await fetch('http://localhost:5000/admin-review-transaction', {
         method: 'POST',
         headers: {
@@ -54,20 +70,23 @@ const AdminStageUnderReview = ({ transaction }) => {
         throw new Error(data.error || 'Failed to reject transaction.');
       }
       
-      // Success. The onSnapshot listener on the page will see the status change.
+      alert("Transaction has been rejected and cancelled on-chain.");
       
     } catch (err) {
       console.error('Error rejecting:', err);
-      setError(err.message);
+      const msg = err.reason ? parseContractError(err) : err.message;
+      setError(msg);
     } finally {
       setIsLoading(false);
+      setStatusText('');
     }
   };
 
-  // APPROVE Action
+  // --- APPROVE ACTION (Blockchain + Database Sync) ---
   const handleApprove = async () => {
     setIsLoading(true);
     setError('');
+    setStatusText('Connecting to Wallet...');
 
     try {
       const token = await currentUser.getIdToken();
@@ -102,52 +121,65 @@ const AdminStageUnderReview = ({ transaction }) => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
+
       const landContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
-      alert("Please confirm the final approval in MetaMask to transfer ownership.");
+      // Confirm with user before expensive transaction
+      if (!window.confirm("Confirming this in MetaMask will transfer ownership of the property. This is irreversible. Continue?")) {
+        setIsLoading(false);
+        setStatusText('');
+        return;
+      }
 
+      setStatusText('Please sign in MetaMask...');
       const tx = await landContract.finalAdminApproval(onChainTxId);
+      
+      setStatusText('Confirming ownership transfer on blockchain...');
       const receipt = await tx.wait();
       const finalTxHash = receipt.hash;
       
       console.log("Final transfer successful, txHash:", finalTxHash);
 
-      // --- STEP 3: Update Firestore with Final Status & Log ---
-      const txDocRef = doc(db, "transactions", transaction.id);
-      await updateDoc(txDocRef, {
-        status: "Finalized",
-        finalTxHash: finalTxHash,
-        finalizedAt: serverTimestamp()
+      // --- STEP 3: Call Backend to Finalize & Update Ownership ---
+      setStatusText('Finalizing in database...');
+      const finalizeResponse = await fetch('http://localhost:5000/finalize-transaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          transactionId: transaction.id,
+          txHash: finalTxHash,
+          tokenId: transaction.tokenId,
+          newOwnerUid: transaction.buyer.uid,
+          newOwnerWallet: transaction.buyer.walletAddress
+        })
       });
-      
-      const adminName = userData?.firstName || currentUser.email;
-      await addDoc(collection(db, "logs"), {
-        message: `Admin ${adminName} finalized transaction for ${transaction.parcelNumber}.`,
-        timestamp: serverTimestamp(),
-        txHash: finalTxHash,
-        relatedTransaction: transaction.id
-      });
-      
-      // Success! Component will unmount.
+
+      if (!finalizeResponse.ok) {
+        throw new Error("Blockchain transfer succeeded, but database sync failed. Please contact support.");
+      }
+
+      alert("Transaction Finalized. Ownership has been transferred.");
 
     } catch (err) {
       console.error('Error submitting review:', err);
-      setError(err.reason || err.message);
+      const msg = err.reason ? parseContractError(err) : err.message;
+      setError(msg);
     } finally {
       setIsLoading(false);
+      setStatusText('');
     }
   };
-  
-  // ---
-  // --- *** END OF NEW LOGIC *** ---
-  // ---
 
+  // --- RENDER ---
   return (
     <div className="admin-review-container">
       <h4>Final Admin Review</h4>
       <p>
         Review all documents and transaction details. Approving this
-        transaction will finalize the deal and **transfer ownership of the property**.
+        transaction will finalize the deal and <strong>transfer ownership of the property</strong>.
         This action is irreversible.
       </p>
 
@@ -168,6 +200,9 @@ const AdminStageUnderReview = ({ transaction }) => {
             placeholder="e.g., Discrepancy found in title deed..."
           ></textarea>
           {error && <p className="error-message">{error}</p>}
+          {isLoading && statusText && (
+            <p className="status-text">{statusText}</p>
+          )}
         </div>
       ) : (
         // --- DISPLAY THE DOCUMENT LIST ---
@@ -205,17 +240,21 @@ const AdminStageUnderReview = ({ transaction }) => {
           <>
             <button
               className="stage-button button-secondary"
-              onClick={() => setShowRejectConfirmation(false)}
+              onClick={() => {
+                setShowRejectConfirmation(false);
+                setComment('');
+                setError('');
+              }}
               disabled={isLoading}
             >
               Cancel
             </button>
             <button
               className="stage-button button-reject"
-              onClick={handleReject} // --- Use new handler ---
+              onClick={handleReject}
               disabled={isLoading}
             >
-              {isLoading ? 'Rejecting...' : 'Confirm Rejection'}
+              {isLoading ? (statusText || 'Rejecting...') : 'Confirm Rejection'}
             </button>
           </>
         ) : (
@@ -230,11 +269,11 @@ const AdminStageUnderReview = ({ transaction }) => {
             </button>
             <button
               className="stage-button button-accept"
-              onClick={handleApprove} // --- Use new handler ---
+              onClick={handleApprove}
               disabled={isLoading}
             >
               <img src={checkIcon} alt="Approve" />
-              {isLoading ? 'Processing...' : 'Approve & Transfer Ownership'}
+              {isLoading ? (statusText || 'Processing...') : 'Approve & Transfer Ownership'}
             </button>
           </>
         )}
@@ -244,6 +283,12 @@ const AdminStageUnderReview = ({ transaction }) => {
       {!showRejectConfirmation && error && (
         <p className="error-message" style={{textAlign: 'right', marginTop: '12px'}}>
           {error}
+        </p>
+      )}
+      
+      {!showRejectConfirmation && isLoading && statusText && (
+        <p className="status-text" style={{textAlign: 'right', marginTop: '12px'}}>
+          {statusText}
         </p>
       )}
     </div>

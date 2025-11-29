@@ -38,11 +38,7 @@ const AdvocateSummary = () => {
     // --- 1. Query for ALL transactions managed by this advocate ---
     const allTxQuery = query(
       collection(db, "transactions"),
-      //
-      // --- THIS IS THE FIX ---
-      // We look for the 'uid' field inside the 'advocate' object
       where("advocate.uid", "==", advocateId)
-      //
     );
 
     const unsubscribe = onSnapshot(allTxQuery, (snapshot) => {
@@ -54,7 +50,8 @@ const AdvocateSummary = () => {
         const tx = doc.data();
         
         // --- 2. Logic to sort transactions ---
-        if (tx.status === "Finalized" || tx.status === "Rejected") {
+        // CHANGED: Added "Cancelled" to the history check
+        if (tx.status === "Finalized" || tx.status === "Rejected" || tx.status === "Cancelled" || tx.status === 'Documents Rejected') {
           // It's part of history
           history++;
         } else {
@@ -62,7 +59,6 @@ const AdvocateSummary = () => {
           active++;
           
           // Check if it needs this advocate's attention
-          // (You would customize this logic)
           if (tx.status === "Docs Shared" || tx.status === "Initiated") {
             attention++;
           }

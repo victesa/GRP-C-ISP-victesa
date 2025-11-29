@@ -33,6 +33,8 @@ import PropertyReviewPage from './PropertyReviewPage';
 import AdminTransactionRequests from './AdminTransactionRequests';
 import AdminTransactionDetailPage from './AdminTransactionDetailPage';
 import LogViewer from './components/LogViewer';
+import HotspotMap from './components/HotspotMap';
+import UserManagement from './UserManagement';
 
 function App() {
   return (
@@ -52,10 +54,11 @@ function App() {
 
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<LogViewer />} />
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="transactions" element={<TransactionsPage />} />
             <Route path="advocate-transactions" element={<AdvocateDashboard />} />
             <Route path="transactions/:transactionId" element={<TransactionDetailPage />} />
+            <Route path='hotspots-map' element={<HotspotMap/>}/>
             
             {/* --- 2. ADD THE NEW ADVOCATE DETAIL ROUTE --- */}
             <Route path="advocate/transactions/:transactionId" element={<AdvocateTransactionDetailPage />} />
@@ -74,10 +77,11 @@ function App() {
         <Route element={<AdminRoute />}>
           <Route path="admin" element={<AdminLayout />}> 
             <Route index element={<Navigate to="dashboard" replace />} /> 
-            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="advocates" element={<AdvocateManagement />} />
             <Route path="advocates/:applicationId" element={<AdvocateApplicationDetails />} />
             <Route path="properties" element={<PropertyRequests />} />
+            <Route path="users" element={<UserManagement/>}/>
             <Route path="properties/:propertyId" element={<PropertyReviewPage />} />
             <Route path="transactions" element={<AdminTransactionRequests />} />
             <Route path="transactions/:transactionId" element={<AdminTransactionDetailPage />} />

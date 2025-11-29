@@ -17,13 +17,13 @@ const DealStepper = ({ currentStage }) => {
     'Finalized'
   ];
 
-  // ---
-  // --- THIS IS THE FIX: Make the search case-insensitive ---
-  // ---
+  // Make the search case-insensitive
   const currentIndex = stages.findIndex(stage => 
     stage.toLowerCase() === (currentStage || '').toLowerCase()
   );
-  // ---
+
+  // Check if stage is finalized
+  const isFinalized = (currentStage || '').toLowerCase() === 'finalized';
 
   const getAlignment = (index) => {
     if (index === stages.length - 1) {
@@ -40,7 +40,11 @@ const DealStepper = ({ currentStage }) => {
         {stages.map((stage, index) => {
           
           let state = 'pending'; 
-          if (index < currentIndex) {
+          
+          // If finalized, mark all as completed
+          if (isFinalized) {
+            state = 'completed';
+          } else if (index < currentIndex) {
             state = 'completed';
           } else if (index === currentIndex) {
             state = 'current';
@@ -68,7 +72,11 @@ const DealStepper = ({ currentStage }) => {
       <div className="stepper-bar-row">
         {stages.map((stage, index) => {
           let state = 'pending'; 
-          if (index < currentIndex) {
+          
+          // If finalized, mark all segments as completed
+          if (isFinalized) {
+            state = 'completed';
+          } else if (index < currentIndex) {
             state = 'completed';
           } else if (index === currentIndex) {
             state = 'current';
@@ -82,7 +90,6 @@ const DealStepper = ({ currentStage }) => {
     </div>
   );
 };
-
 
 // --- 2. THE MAIN COMPONENT ---
 const DealHeader = ({ currentStage }) => {

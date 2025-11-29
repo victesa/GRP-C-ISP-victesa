@@ -1,12 +1,24 @@
 import React, { useState } from 'react';
-import './AddPropertyPage.css'; // We will create this new CSS file
+import './AddPropertyPage.css';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './hooks/useAuth'; // To get the user's token
+import { useAuth } from './hooks/useAuth';
 
 // --- IMPORT YOUR ICONS HERE ---
 import uploadIcon from './assets/icons/upload-cloud.png';
 import checkIcon from './assets/icons/check-white.png';
 import fileCheckIcon from './assets/icons/file-check.png'; 
+
+// --- Kenya Counties List (All 47 official counties) ---
+const KENYA_COUNTIES = [
+  "Mombasa", "Kwale", "Kilifi", "Tana River", "Lamu", "Taita-Taveta", "Taita/Taveta",
+  "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Meru", "Tharaka-Nithi", 
+  "Tharaka Nithi", "Embu", "Kitui", "Machakos", "Makueni", "Nyandarua", "Nyeri", 
+  "Kirinyaga", "Murang'a", "Muranga", "Kiambu", "Turkana", "West Pokot", "Samburu", 
+  "Trans Nzoia", "Uasin Gishu", "Elgeyo-Marakwet", "Elgeyo/Marakwet", "Elgeyo Marakwet",
+  "Nandi", "Baringo", "Laikipia", "Nakuru", "Narok", "Kajiado", "Kericho", "Bomet", 
+  "Kakamega", "Vihiga", "Bungoma", "Busia", "Siaya", "Kisumu", "Homa Bay", "Migori", 
+  "Kisii", "Nyamira", "Nairobi"
+];
 
 // --- Reusable Input Components ---
 const InputGroup = ({ label, type, placeholder, id, value, onChange }) => (
@@ -43,10 +55,9 @@ const FileUploadGroup = ({ label, id, accept, onChange, fileName }) => (
 );
 // --- End of Reusable Components ---
 
-
 const AddPropertyPage = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth(); // Get the logged-in user
+  const { currentUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -70,12 +81,36 @@ const AddPropertyPage = () => {
     setFileData(prev => ({ ...prev, [name]: files[0] }));
   };
 
+  // --- Validation Function to Check for Kenya Counties ---
+  const validateKenyanLocation = (location) => {
+    if (!location || location.trim().length === 0) {
+      return false;
+    }
+
+    const locationLower = location.toLowerCase();
+    
+    // Check if any Kenyan county is mentioned in the location
+    const hasKenyanCounty = KENYA_COUNTIES.some(county => 
+      locationLower.includes(county.toLowerCase())
+    );
+
+    return hasKenyanCounty;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!currentUser) {
       setError("You must be logged in to add a property.");
       return;
     }
+
+    // --- Validate Kenya Location ---
+    if (!validateKenyanLocation(formData.location)) {
+      setError("Invalid location. Please enter a valid Kenyan location with a county name (e.g., Kitengela, Kajiado County).");
+      return;
+    }
+
     setIsLoading(true);
     setError('');
 
@@ -99,7 +134,6 @@ const AddPropertyPage = () => {
       const response = await fetch('http://localhost:5000/add-property', {
         method: 'POST',
         headers: {
-          // --- Send the token for verification ---
           'Authorization': `Bearer ${idToken}`
         },
         body: data, 
@@ -109,7 +143,7 @@ const AddPropertyPage = () => {
 
       if (response.ok) {
         alert('Property submitted for verification!');
-        navigate('/properties'); // Navigate back to the properties list
+        navigate('/properties');
       } else {
         throw new Error(result.error || 'Failed to submit property.');
       }
@@ -122,7 +156,7 @@ const AddPropertyPage = () => {
   };
 
   return (
-    <div className="add-property-page"> {/* Use a unique class name */}
+    <div className="add-property-page">
       <div className="page-header">
         <h1>Add a New Property</h1>
         <p className="page-subtitle">
@@ -139,6 +173,7 @@ const AddPropertyPage = () => {
             <InputGroup
               label="Land Parcel Number (Title No.)"
               id="parcelNumber"
+              type="text"
               placeholder="e.g., KAJIADO/KITENGELA/12345"
               value={formData['parcelNumber']}
               onChange={handleTextChange}
@@ -146,6 +181,7 @@ const AddPropertyPage = () => {
             <InputGroup
               label="Location"
               id="location"
+              type="text"
               placeholder="e.g., Kitengela, Kajiado County"
               value={formData['location']}
               onChange={handleTextChange}

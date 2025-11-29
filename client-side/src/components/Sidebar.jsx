@@ -9,7 +9,7 @@ import transactionsIcon from '../assets/icons/transactions.png';
 import settingsIcon from '../assets/icons/settings.png';
 import propertiesIcon from "../assets/icons/land.png";
 import helpIcon from "../assets/icons/help.png";
-import advocateIcon from '../assets/icons/help.png';
+import advocateIcon from '../assets/icons/lawyer.png';
 
 // --- This component now renders an <img> tag ---
 const Icon = ({ src, alt }) => (
@@ -39,7 +39,6 @@ const Sidebar = ({ isAdvocate }) => {
           <li className="sidebar-nav-item">
             <NavLink to="/transactions">
               <Icon src={transactionsIcon} alt="Transactions" /> Transactions
-              <span className="nav-notification-badge">1</span>
             </NavLink>
           </li>
           <li className="sidebar-nav-item">

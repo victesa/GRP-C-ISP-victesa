@@ -1,0 +1,111 @@
+/* components/dashboard/MarketHealth.css */
+
+.health-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  /* NEW: Adding distinct border and shadow to match Hotspot card */
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  
+  height: 100%; 
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* --- Chart Layout --- */
+.chart-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px; /* Increased gap */
+  padding-top: 16px;
+}
+
+/* --- The Donut (CSS Magic) --- */
+.donut-chart {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* The gradient is set inline in the JS component */
+  transition: background 0.5s ease-out;
+}
+
+/* The "Hole" in the donut */
+.inner-circle {
+  width: 110px; /* Smaller than donut-chart to create thickness */
+  height: 110px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.05); /* Inner shadow depth */
+  z-index: 2;
+}
+
+.total-number {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+}
+
+.total-label {
+  font-size: 11px;
+  color: #6B7280;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* --- Legend Section --- */
+.chart-legend {
+  width: 100%;
+  display: flex;
+  flex-direction: row; /* Horizontal layout for the legend */
+  justify-content: space-around; /* Spread them out */
+  border-top: 1px solid #F3F4F6;
+  padding-top: 16px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px; /* Rounded square */
+}
+
+.dot.safe { background-color: #10B981; }
+.dot.risky { background-color: #EF4444; }
+
+.legend-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.legend-text .label {
+  font-size: 11px;
+  color: #6B7280;
+  margin-bottom: 0px;
+}
+
+.legend-text .value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+}

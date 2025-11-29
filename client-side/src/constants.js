@@ -2,7 +2,7 @@
 export const GANACHE_URL = "http://127.0.0.1:7545";
 
 // This is the Contract Address you copied from Remix
-export const CONTRACT_ADDRESS = "0x24F3D44FAA8D2002F083fbb97dA1502EDA3Bfdf9";
+export const CONTRACT_ADDRESS = "0xed275F2fE5Fa183f95491541cE6F5EA97bA7b013";
 
 // This is the ABI JSON you just copied from Remix
 export const CONTRACT_ABI = [
@@ -136,6 +136,19 @@ export const CONTRACT_ABI = [
 		],
 		"name": "BatchMetadataUpdate",
 		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "transactionId",
+				"type": "bytes32"
+			}
+		],
+		"name": "cancelTransaction",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [
@@ -439,6 +452,31 @@ export const CONTRACT_ABI = [
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "transactionId",
+				"type": "bytes32"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "cancelledBy",
+				"type": "address"
+			}
+		],
+		"name": "TransactionCancelled",
+		"type": "event"
 	},
 	{
 		"anonymous": false,

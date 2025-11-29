@@ -1,10 +1,10 @@
-# Transaction Branch - Land Registry System
+# Land Registry System
 
-This branch implements the transaction stages and smart contract functionality for the blockchain-based land registry system.
+A blockchain-based land registry system implementing secure, transparent, and immutable land ownership transfers using Ethereum smart contracts.
 
 ## Overview
 
-The transaction branch builds upon the authentication module to add comprehensive transaction management and multi-stage land transfer workflows. This implementation utilizes Ethereum smart contracts to ensure secure, transparent, and immutable land ownership transfers.
+This project provides a comprehensive solution for managing land transactions with multi-stage workflows, smart contract integration, and role-based access control. The system ensures transparency and prevents fraud through blockchain technology while maintaining proper legal oversight.
 
 ## Features Implemented
 
@@ -77,4 +77,73 @@ The transaction branch builds upon the authentication module to add comprehensiv
 
 ## Getting Started
 
-### Installation
+### 1. Environment Setup
+Before running the application, you need to set up the blockchain environment:
+
+1.  **Download Tools**: Download and install [Ganache](https://trufflesuite.com/ganache/) and the [MetaMask](https://metamask.io/) browser extension.
+2.  **Configure Accounts**:
+    - Open Ganache and start a workspace.
+    - Connect MetaMask to the Ganache network (typically `http://127.0.0.1:7545` with Chain ID `1337`).
+    - Import 4 distinct accounts from Ganache into MetaMask using their private keys.
+    - For the best testing experience, use these 4 accounts as: Buyer, Seller, Advocate, and Land Official.
+
+### 2. Installation
+
+Clone the repository to your local machine:
+```bash
+git clone [https://your-repository-url-here.git](https://your-repository-url-here.git) 
+```
+
+### 3. Frontend Setup
+
+Navigate to the client folder and install dependencies:
+```bash
+cd client-side
+npm install
+npm run dev
+```
+The application will be available at http://localhost:5174
+
+### 4. Backend Setup
+
+Navigate to the backend folder and set up the Python environment. It is recommended to use a virtual environment:
+```bash
+cd backend
+python -m venv venv
+```
+
+Activate the virtual environment: 
+- Windows: `venv\Scripts\activate`
+- macOS/Linux: `source venv/bin/activate`
+
+Install all dependencies from `requirements.txt`:
+
+```bash
+pip install -r requirements.txt
+```
+Run the Flask server:
+
+```bash
+python app.py
+```
+The backend will now be live.
+
+### 5. Blockchain Setup
+1. Open Remix IDE in your browser.
+2. In the contracts folder of this repository, locate the smart contract file.
+3. Paste the contract code into a new file in Remix IDE.
+4. Navigate to the Solidity Compiler tab and select compiler version `0.8.19`.
+5. Click "Compile" to compile the smart contract.
+6. Ensure Ganache is running on your local machine.
+7. Go to the "Deploy & Run Transactions" tab in Remix.
+8. Select "Injected Provider - MetaMask" as the environment.
+9. Deploy the contract to your local Ganache network.
+10. Copy the deployed contract address and update it in your frontend configuration.
+
+### 6. Usage
+1. Access the application at `http://localhost:5174`
+2. Connect your MetaMask wallet
+3. Log in with the appropriate role (Admin, Advocate, Buyer, or Seller)
+4. Create and manage land transactions through the multi-stage workflow
+5. All transactions are recorded immutably on the Ethereum blockchain
+

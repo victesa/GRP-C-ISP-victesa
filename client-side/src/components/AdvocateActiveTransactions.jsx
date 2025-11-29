@@ -8,7 +8,7 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 // --- IMPORT YOUR ICONS HERE ---
 import searchIcon from '../assets/icons/help.png';
 import plusIcon from '../assets/icons/help.png';
-import menuIcon from '../assets/icons/help.png';
+import menuIcon from '../assets/icons/next.png';
 
 // (Helper function to style status pills)
 const getStatusClass = (status) => {
@@ -19,6 +19,7 @@ const getStatusClass = (status) => {
     case 'Verified': return 'status-verified';
     case 'Finalized': return 'status-finalized';
     case 'Rejected': return 'status-rejected';
+    case 'Cancelled': return 'status-rejected'; // Added Cancelled styling
     default: return 'status-default';
   }
 };
@@ -44,11 +45,7 @@ const AdvocateActiveTransactions = ({ showCreateButton = false }) => {
     // This query finds all transactions where the advocate is involved
     const transactionsQuery = query(
       collection(db, "transactions"),
-      //
-      // --- THIS IS THE FIX ---
-      // We look for the 'uid' field inside the 'advocate' object
       where("advocate.uid", "==", currentUser.uid)
-      //
     );
 
     const unsubscribe = onSnapshot(transactionsQuery, (snapshot) => {
@@ -69,9 +66,21 @@ const AdvocateActiveTransactions = ({ showCreateButton = false }) => {
 
     // Filter by Active Tab
     if (activeTab === 'active') {
-      txs = txs.filter(tx => tx.status !== 'Finalized' && tx.status !== 'Rejected');
+      // Exclude Finalized, Rejected, AND Cancelled
+      txs = txs.filter(tx => 
+        tx.status !== 'Finalized' && 
+        tx.status !== 'Rejected' && 
+        tx.status !== 'Cancelled' &&
+        tx.status !== 'Documents Rejected'
+      );
     } else {
-      txs = txs.filter(tx => tx.status === 'Finalized' || tx.status === 'Rejected');
+      // Include Finalized, Rejected, OR Cancelled
+      txs = txs.filter(tx => 
+        tx.status === 'Finalized' || 
+        tx.status === 'Rejected' || 
+        tx.status === 'Cancelled' ||
+        tx.status === 'Documents Rejected'
+      );
     }
 
     // Filter by Status Dropdown
@@ -137,6 +146,7 @@ const AdvocateActiveTransactions = ({ showCreateButton = false }) => {
             <option>Under Review</option>
             <option>Finalized</option>
             <option>Rejected</option>
+            <option>Cancelled</option> {/* Added Option */}
           </select>
           
           {/* "Create Transactions" button (conditionally rendered) */}
@@ -209,4 +219,4 @@ const AdvocateActiveTransactions = ({ showCreateButton = false }) => {
   );
 };
 
-export default AdvocateActiveTransactions;// Updated Oct 24
+export default AdvocateActiveTransactions;

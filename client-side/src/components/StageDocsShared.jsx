@@ -1,26 +1,29 @@
 import React, { useState } from 'react';
-import './StageDocsShared.css'; // Using your provided CSS
-import { useAuth } from '../hooks/useAuth'; // Import useAuth
+import './StageDocsShared.css'; 
+import { useAuth } from '../hooks/useAuth';
+import { ethers } from 'ethers'; 
+import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../constants';
+import { parseContractError } from '../utils/errorParser';
 
-// --- IMPORT YOUR ICONS HERE ---
-import docIcon from '../assets/icons/help.png'; 
-import checkIcon from '../assets/icons/help.png';
-import rejectIcon from '../assets/icons/help.png'; 
-import pendingIcon from '../assets/icons/help.png';
 
-/**
- * A sub-component to show the verification status of both parties.
- */
+// --- ICONS ---
+import docIcon from '../assets/icons/file.png'; 
+import checkIcon from '../assets/icons/check-square.png';
+import rejectIcon from '../assets/icons/reject.png'; 
+import pendingIcon from '../assets/icons/pending.png';
+
+
 const VerificationStatusBox = ({ myStatus, otherPartyStatus, otherPartyRole }) => {
   const getStatus = (status) => {
-    // status can be true, false, or undefined/null
     if (status === true) return { text: 'Verified', icon: checkIcon, className: 'verified' };
     if (status === false) return { text: 'Rejected', icon: rejectIcon, className: 'rejected' };
     return { text: 'Pending', icon: pendingIcon, className: 'pending' };
   };
 
+
   const myDisplayStatus = getStatus(myStatus);
   const otherDisplayStatus = getStatus(otherPartyStatus);
+
 
   return (
     <div className="verification-status-container">
@@ -43,47 +46,96 @@ const VerificationStatusBox = ({ myStatus, otherPartyStatus, otherPartyRole }) =
 };
 
 
-/**
- * The Main Component
- */
 const StageDocsShared = ({ transaction }) => {
   const { currentUser } = useAuth();
-
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [comment, setComment] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [statusText, setStatusText] = useState(''); 
 
-  // --- 1. Get Real Data ---
+
   const docList = transaction.advocateDocuments || [];
-  
-  // Determine user's role and verification status
   const isBuyer = currentUser.uid === transaction.buyer.uid;
   
-  // myStatus can be true (accepted), false (rejected), or undefined/null (pending)
   const myStatus = isBuyer ? transaction.buyer.verifiedDocs : transaction.seller.verifiedDocs;
-  
-  // Get other party's info for the status box
   const otherPartyStatus = isBuyer ? transaction.seller.verifiedDocs : transaction.buyer.verifiedDocs;
   const otherPartyRole = isBuyer ? 'Seller' : 'Buyer';
 
-  
-  // --- 2. API Call Function ---
+
+  // Handle document click - opens document URL
+  const handleDocumentClick = (docUrl, docName) => {
+    try {
+      if (!docUrl) {
+        alert('Document URL is missing or expired.');
+        return;
+      }
+      
+      // Open in new tab
+      window.open(docUrl, '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      console.error('Error opening document:', err);
+      alert('Failed to open document. The link may have expired.');
+    }
+  };
+
+
   const handleSubmit = async (action) => {
     if (action === 'reject' && comment.trim() === '') {
       setErrorMessage('A comment is required to reject.');
       return;
     }
 
+
     setIsLoading(true);
     setErrorMessage('');
+    setStatusText('Connecting to Wallet...');
+
 
     try {
       const token = await currentUser.getIdToken();
+
+
+      // --- 1. BLOCKCHAIN INTERACTION (With Hash Capture) ---
+      if (!window.ethereum) throw new Error("MetaMask is not installed.");
       
-      // ---
-      // --- THIS IS THE FIX: Point to port 5000 ---
-      // ---
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+
+      // Security: Ensure wallet matches user profile
+      const walletAddress = await signer.getAddress();
+      const myRegisteredWallet = isBuyer ? transaction.buyer.walletAddress : transaction.seller.walletAddress;
+      
+      if (walletAddress.toLowerCase() !== myRegisteredWallet.toLowerCase()) {
+        throw new Error(`Wallet mismatch. Please switch to ${myRegisteredWallet}`);
+      }
+
+
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      
+      let verificationTxHash = null; // ← NEW: Capture hash
+      
+      if (action === 'accept') {
+        setStatusText('Please sign in MetaMask...');
+        const tx = await contract.acceptDocuments(transaction.onChainTxId);
+        setStatusText('Confirming on Chain...');
+        const receipt = await tx.wait();
+        verificationTxHash = receipt.hash; // ← NEW: Capture hash
+        console.log(`✅ Document acceptance mined: ${verificationTxHash}`);
+        
+      } else if (action === 'reject') {
+        setStatusText('Please sign cancellation in MetaMask...');
+        const tx = await contract.cancelTransaction(transaction.onChainTxId);
+        setStatusText('Recording cancellation on-chain...');
+        const receipt = await tx.wait();
+        verificationTxHash = receipt.hash; // ← NEW: Capture hash
+        console.log(`✅ Document rejection mined: ${verificationTxHash}`);
+      }
+
+
+      // --- 2. BACKEND SYNC (With Hash) ---
+      setStatusText('Updating Database...');
       const response = await fetch('http://localhost:5000/verify-documents', {
         method: 'POST',
         headers: {
@@ -92,37 +144,35 @@ const StageDocsShared = ({ transaction }) => {
         },
         body: JSON.stringify({
           transactionId: transaction.id,
-          action: action, // 'accept' or 'reject'
-          comment: comment
+          action: action,
+          comment: comment,
+          verificationTxHash: verificationTxHash // ← NEW: Send hash
         })
       });
       
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit verification.');
-      }
+      if (!response.ok) throw new Error(data.error || 'Failed to submit verification.');
       
-      // Success! 
-      // ---
-      // --- THIS IS THE FIX: Logic removed from here ---
-      // ---
-      // The backend now handles advancing the stage.
-      // The onSnapshot listener in TransactionDetailPage
-      // will see the status change and update the UI automatically.
+      alert(`✅ Documents ${action}ed successfully!`);
+      window.location.reload(); // Refresh to show updated status
+      
       setShowCommentBox(false);
+      setComment('');
+
 
     } catch (err) {
       console.error('Error submitting verification:', err);
-      setErrorMessage(err.message);
+      const msg = err.reason ? parseContractError(err) : err.message;
+      setErrorMessage(msg);
     } finally {
       setIsLoading(false);
+      setStatusText('');
     }
   };
 
-  // --- 3. Render Action Buttons (or status) ---
+
+  // --- RENDER HELPERS ---
   const renderActions = () => {
-    // Case 1: Already Accepted
     if (myStatus === true) {
       return (
         <div className="action-message accepted">
@@ -132,25 +182,21 @@ const StageDocsShared = ({ transaction }) => {
       );
     }
     
-    // Case 2: Already Rejected
     if (myStatus === false) {
       return (
         <div className="action-message rejected">
           <img src={rejectIcon} alt="Rejected" />
-          You have rejected these documents. The advocate has been notified.
+          You have rejected these documents. The transaction has been cancelled.
         </div>
       );
     }
 
-    // Case 3: Action is pending
+
     return (
       <>
-        {/* --- Rejection Form (Conditional) --- */}
         {showCommentBox && (
           <div className="rejection-form">
-            <label htmlFor="rejection-comment">
-              Please provide comments for rejection:
-            </label>
+            <label htmlFor="rejection-comment">Please provide comments for rejection:</label>
             <textarea
               id="rejection-comment"
               className="rejection-textarea"
@@ -165,14 +211,17 @@ const StageDocsShared = ({ transaction }) => {
           </div>
         )}
 
-        {/* --- Action Buttons --- */}
+
         <div className="stage-actions">
           {showCommentBox ? (
-            // --- Show these buttons when rejecting ---
             <>
               <button
                 className="stage-button button-secondary"
-                onClick={() => setShowCommentBox(false)}
+                onClick={() => {
+                  setShowCommentBox(false);
+                  setComment('');
+                  setErrorMessage('');
+                }}
                 disabled={isLoading}
               >
                 Cancel
@@ -183,11 +232,10 @@ const StageDocsShared = ({ transaction }) => {
                 disabled={isLoading}
               >
                 <img src={rejectIcon} alt="Reject" />
-                {isLoading ? 'Submitting...' : 'Submit Rejection'}
+                {isLoading ? (statusText || 'Submitting...') : 'Submit Rejection'}
               </button>
             </>
           ) : (
-            // --- Show these buttons by default ---
             <>
               <button
                 className="stage-button button-reject"
@@ -203,7 +251,7 @@ const StageDocsShared = ({ transaction }) => {
                 disabled={isLoading}
               >
                 <img src={checkIcon} alt="Accept" />
-                {isLoading ? 'Accepting...' : 'Accept'}
+                {isLoading ? (statusText || 'Accepting...') : 'Accept'}
               </button>
             </>
           )}
@@ -211,6 +259,7 @@ const StageDocsShared = ({ transaction }) => {
       </>
     );
   };
+
 
   return (
     <div className="stage-card">
@@ -221,37 +270,39 @@ const StageDocsShared = ({ transaction }) => {
         Both parties must accept to move to the next stage.
       </p>
 
-      {/* --- Status Box --- */}
+
       <VerificationStatusBox
         myStatus={myStatus}
         otherPartyStatus={otherPartyStatus}
         otherPartyRole={otherPartyRole}
       />
 
-      {/* --- List of Documents --- */}
+
       <div className="doc-list">
         {docList.map((doc, index) => (
-          <a 
-            key={index} // Using index as a fallback
-            href={doc.url} 
-            target="_blank" 
-            rel="noopener noreferrer" 
+          <button 
+            key={index} 
+            onClick={() => handleDocumentClick(doc.url, doc.name)}
             className="doc-item"
+            type="button"
           >
             <img src={docIcon} alt="Document" className="doc-icon" />
             <span className="doc-name">{doc.name}</span>
-          </a>
+            <span className="doc-view-hint">Click to view</span>
+          </button>
         ))}
         {docList.length === 0 && (
-          <p className="no-docs-message">The advocate has not uploaded any documents for this stage yet.</p>
+          <p className="no-docs-message">
+            The advocate has not uploaded any documents for this stage yet.
+          </p>
         )}
       </div>
       
-      {/* --- Render Buttons or Status Message --- */}
-      {/* Don't show actions if there are no docs */}
+      {errorMessage && !showCommentBox && <p className="error-message">{errorMessage}</p>}
       {docList.length > 0 && renderActions()}
     </div>
   );
 };
 
-export default StageDocsShared;// Updated Oct 18
+
+export default StageDocsShared;

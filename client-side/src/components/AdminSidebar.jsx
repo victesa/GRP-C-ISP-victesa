@@ -11,6 +11,7 @@ import usersIcon from '../assets/icons/profile.png';
 import settingsIcon from '../assets/icons/settings.png';
 import helpIcon from '../assets/icons/help.png';
 import propertiesIcon from '../assets/icons/land.png'; // <-- 1. ADDED NEW ICON
+import users from '../assets/icons/users.png'
 
 const Icon = ({ src, alt }) => (
   <img src={src} alt={alt} className="sidebar-icon" />
@@ -51,6 +52,11 @@ const AdminSidebar = () => {
           <li className="sidebar-nav-item">
             <NavLink to="/admin/transactions">
               <Icon src={transactionsIcon} alt="Transactions" /> Transaction Oversight
+            </NavLink>
+          </li>
+          <li className="sidebar-nav-item">
+            <NavLink to="/admin/users">
+              <Icon src={users} alt="Users" /> User Management
             </NavLink>
           </li>
         </ul>

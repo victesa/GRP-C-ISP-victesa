@@ -59,32 +59,37 @@
   margin: 0 0 20px 0;
 }
 
-/* --- Left Column Card Styles --- */
+/* --- FIXED Detail Grid --- */
+/* --- FIXED Detail Grid - 2 COLUMNS --- */
 .detail-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 2 columns */
-  gap: 24px;
+  grid-template-columns: repeat(2, 1fr); /* 2 equal columns */
+  gap: 24px 32px; /* row gap 24px, column gap 32px */
 }
 
 .detail-item {
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
 .detail-label {
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 600;
   color: var(--label-text);
-  margin-bottom: 6px;
+  margin-bottom: 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .detail-value {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--value-text);
+  word-break: break-all; /* Breaks long addresses */
+  line-height: 1.5;
 }
+
 
 .document-link {
   display: flex;

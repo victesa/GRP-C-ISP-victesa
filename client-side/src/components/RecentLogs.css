@@ -1,0 +1,188 @@
+/* components/dashboard/RecentLogs.css */
+
+.logs-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* --- Header with Search --- */
+.card-header .header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 20px;
+}
+
+.card-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  flex: 1;
+}
+
+/* --- Search Container --- */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.logs-search-input {
+  width: 250px;
+  padding: 8px 32px 8px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #374151;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.logs-search-input:focus {
+  outline: none;
+  border-color: #10B981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.logs-search-input::placeholder {
+  color: #9CA3AF;
+}
+
+/* --- Clear Search Button --- */
+.clear-search-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #6B7280;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-search-btn:hover {
+  background: #F3F4F6;
+  color: #374151;
+}
+
+/* --- Table Container --- */
+.logs-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.logs-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 600px;
+}
+
+.logs-table th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 0 16px 0;
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.logs-table td {
+  padding: 20px 0;
+  border-bottom: 1px solid #F3F4F6;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.logs-table tr:last-child td {
+  border-bottom: none;
+}
+
+.logs-table th:first-child,
+.logs-table td:first-child {
+  text-align: center;
+  width: 60px;
+}
+
+/* --- Status Dots --- */
+.status-dot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.status-dot.success { 
+  background-color: #10B981; 
+  box-shadow: 0 0 0 4px #D1FAE5; 
+}
+
+.status-dot.pending { 
+  background-color: #F59E0B; 
+  box-shadow: 0 0 0 4px #FEF3C7; 
+}
+
+.status-dot.failed { 
+  background-color: #EF4444; 
+  box-shadow: 0 0 0 4px #FEE2E2; 
+}
+
+.status-dot.rejected { 
+  background-color: #EF4444; 
+  box-shadow: 0 0 0 4px #FEE2E2; 
+}
+
+/* --- Table Cells --- */
+.operation-cell {
+  font-weight: 500;
+  color: #111827;
+  padding-right: 20px;
+}
+
+.ref-cell {
+  font-family: 'Courier New', Courier, monospace;
+  color: #6B7280;
+  font-size: 13px;
+}
+
+.logs-table th:last-child,
+.time-cell {
+  text-align: right;
+  color: #9CA3AF;
+  font-size: 12px;
+}
+
+/* --- Interactive Row --- */
+.log-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.log-row:hover {
+  background-color: #F9FAFB;
+}
+
+/* --- No Results State --- */
+.no-results {
+  text-align: center;
+  color: #9CA3AF;
+  padding: 40px 20px !important;
+  font-style: italic;
+}

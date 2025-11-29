@@ -20,6 +20,8 @@ const getStatusClass = (status) => {
       return 'status-finalized';
     case 'Rejected':
       return 'status-rejected';
+    case 'Cancelled':
+      return 'status-rejected';
     case 'Initiated':
     default:
       return 'status-default';
@@ -39,12 +41,13 @@ const UserTransactionList = () => {
     if (!currentUser) return;
     setIsLoading(true);
 
-    // ✅ Correct nested Firestore paths
+    // Query for buyer transactions
     const buyerQuery = query(
       collection(db, "transactions"),
       where("buyer.uid", "==", currentUser.uid)
     );
 
+    // Query for seller transactions
     const sellerQuery = query(
       collection(db, "transactions"),
       where("seller.uid", "==", currentUser.uid)
@@ -80,7 +83,7 @@ const UserTransactionList = () => {
     };
   }, [currentUser]);
 
-  // ✅ Merge buyer + seller and filter by tab
+  // Merge buyer + seller and filter by tab
   const filteredTransactions = useMemo(() => {
     const map = new Map();
     transactionsAsBuyer.forEach(tx => map.set(tx.id, tx));
@@ -88,9 +91,23 @@ const UserTransactionList = () => {
 
     const arr = Array.from(map.values());
 
-    return activeTab === 'active'
-      ? arr.filter(tx => tx.status !== 'Finalized' && tx.status !== 'Rejected')
-      : arr.filter(tx => tx.status === 'Finalized' || tx.status === 'Rejected');
+    // Active tab: exclude Finalized, Rejected, and Cancelled
+    if (activeTab === 'active') {
+      return arr.filter(tx => 
+        tx.status !== 'Finalized' && 
+        tx.status !== 'Rejected' && 
+        tx.status !== 'Cancelled' &&
+        tx.status !== 'Documents Rejected'
+      );
+    }
+    
+    // History tab: only show Finalized, Rejected, and Cancelled
+    return arr.filter(tx => 
+      tx.status === 'Finalized' || 
+      tx.status === 'Rejected' || 
+      tx.status === 'Cancelled' ||
+      tx.status === 'Documents Rejected'
+    );
   }, [transactionsAsBuyer, transactionsAsSeller, activeTab]);
 
   return (
@@ -135,7 +152,11 @@ const UserTransactionList = () => {
 
             {!isLoading && filteredTransactions.length === 0 && (
               <tr>
-                <td colSpan="5" className="empty-table-cell">No transactions found.</td>
+                <td colSpan="5" className="empty-table-cell">
+                  {activeTab === 'active' 
+                    ? 'No active transactions found.' 
+                    : 'No transaction history found.'}
+                </td>
               </tr>
             )}
 
@@ -173,4 +194,3 @@ const UserTransactionList = () => {
 };
 
 export default UserTransactionList;
-// Updated Oct 26

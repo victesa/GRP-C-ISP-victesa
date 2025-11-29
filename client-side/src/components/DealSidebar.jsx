@@ -4,9 +4,8 @@ import { useAuth } from '../hooks/useAuth';
 // We no longer need to import db or getDoc
 
 // --- IMPORT YOUR ICONS HERE ---
-import menuIcon from '../assets/icons/help.png';
-import emailIcon from '../assets/icons/help.png';
-import phoneIcon from '../assets/icons/help.png';
+import emailIcon from '../assets/icons/email.png';
+import phoneIcon from '../assets/icons/phone.png';
 // Using a placeholder icon for user avatars
 import userAvatar from '../assets/icons/profile.png'; 
 
@@ -35,9 +34,6 @@ const ContactCard = ({ role, user, isPrimary = false }) => {
           <span className="contact-name">{user.name}</span>
           <span className="contact-title">{role}</span>
         </div>
-        <button className="contact-menu-btn">
-          <img src={menuIcon} alt="Menu" />
-        </button>
       </div>
       
       <div className="contact-details">
@@ -76,6 +72,8 @@ const DealSidebar = ({ transaction }) => {
   
   // 1. Get the Advocate
   const advocate = transaction.advocate;
+
+  console.log("ddd",advocate)
   
   // 2. Determine who the "other party" is
   const isUserTheBuyer = currentUser.uid === transaction.buyer?.uid;
@@ -87,6 +85,7 @@ const DealSidebar = ({ transaction }) => {
       <div className="contacts-header">
         <h2>Key Contacts</h2>
       </div>
+
 
       {/* Advocate Card */}
       <ContactCard

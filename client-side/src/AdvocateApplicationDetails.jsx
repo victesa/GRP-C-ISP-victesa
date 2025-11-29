@@ -55,68 +55,68 @@ const AdminActionsCard = ({ application }) => {
   // --- 1. NEW: handleApprove function ---
   // This now follows the 2-step process: Backend DB update, then Frontend on-chain
   const handleApprove = async () => {
-    if (!currentUser) {
-        alert("You are not logged in.");
-        return;
-    }
-    if (!window.confirm("This will approve the advocate in the database and then request you to grant their role on the blockchain. Continue?")) {
-        return;
-    }
+    if (!currentUser) return alert("You are not logged in.");
+    
+    // 1. Confirm Intent
+    if (!window.confirm("This will approve the advocate in the database and grant the role on-chain. Continue?")) return;
 
     setIsLoading(true);
     let idToken;
     try {
       idToken = await currentUser.getIdToken();
-    } catch (authError) {
-      alert("Session expired. Please log in again.");
+    } catch (e) {
       setIsLoading(false);
-      return;
+      return alert("Session expired.");
     }
 
     try {
-      // --- STEP 1: Call Backend to approve in DB & get wallet address ---
+      // --- STEP 1: Backend Approval (Optimistic) ---
       const payload = { applicationId: application.id, action: 'approve' };
-
+      
       const response = await fetch('http://localhost:5000/review-advocate-application', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
         body: JSON.stringify(payload)
       });
 
       const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error || `Failed to approve application in database.`);
-      }
+      if (!response.ok) throw new Error(result.error || `Database approval failed.`);
 
       const { advocateWalletAddress } = result.onChainData;
-      if (!advocateWalletAddress) {
-        throw new Error("Backend did not return the advocate's wallet address.");
+
+      // --- STEP 2: Blockchain Role Grant ---
+      try {
+        if (!window.ethereum) throw new Error("MetaMask not found.");
+        
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        await provider.send("eth_requestAccounts", []); 
+        const signer = await provider.getSigner();
+        const landContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+        alert("Database updated. Please confirm the transaction in MetaMask to finalize.");
+
+        const tx = await landContract.grantAdvocateRole(advocateWalletAddress);
+        await tx.wait(); // Wait for block confirmation
+
+        alert('Success! Advocate role granted on-chain and in database.');
+        navigate('/admin/advocates');
+
+      } catch (chainError) {
+        // --- CRITICAL: ROLLBACK IF BLOCKCHAIN FAILS ---
+        console.error("Blockchain failed, rolling back DB...", chainError);
+        
+        await fetch('http://localhost:5000/review-advocate-application', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+          body: JSON.stringify({ applicationId: application.id, action: 'rollback_approval' }) // New Action
+        });
+
+        alert(`Blockchain transaction failed: ${chainError.reason || chainError.message}. Database changes have been reverted.`);
       }
-
-      // --- STEP 2: Call Smart Contract (On-Chain Role Grant) ---
-      if (!window.ethereum) {
-        throw new Error("MetaMask is not installed. Please install it to grant roles.");
-      }
-      
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send("eth_requestAccounts", []); // Request Admin's wallet
-      const signer = await provider.getSigner();
-      const landContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-
-      alert("Database approved. Now please confirm the on-chain role grant in MetaMask.");
-
-      const tx = await landContract.grantAdvocateRole(advocateWalletAddress);
-      await tx.wait(); // Wait for the transaction to be mined
-
-      alert('Advocate role successfully granted on the blockchain!');
-      navigate('/admin/advocates'); 
 
     } catch (error) {
-      console.error("Action failed:", error);
-      alert(`Error: ${error.reason || error.message}`);
+      console.error("Process failed:", error);
+      alert(error.message);
     } finally {
       setIsLoading(false);
     }

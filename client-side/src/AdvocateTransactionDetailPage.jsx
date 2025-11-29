@@ -8,6 +8,9 @@ import DealHeader from './components/DealHeader';
 import TransactionDetails from './components/TransactionDetails';
 import AdvocateDealSidebar from './components/AdvocateDealSidebar';
 
+// --- NEW COMPONENT IMPORT ---
+import PropertyHistoryCard from './components/PropertyHistoryCard';
+
 import StageMultiSignature from './components/StageMultiSignature';
 import AdvocateStageDocsShared from './components/AdvocateStageDocsShared';
 import AdvocateStageAwaitingVerification from './components/AdvocateStageAwaitingVerification';
@@ -17,7 +20,7 @@ import './TransactionDetailPage.css';
 const AdvocateTransactionDetailPage = () => {
   const { transactionId } = useParams();
   const { currentUser } = useAuth();
-  
+   
   const [transaction, setTransaction] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -44,15 +47,13 @@ const AdvocateTransactionDetailPage = () => {
   }, [transactionId, currentUser]); 
 
   const renderStageContent = () => {
-    if (!transaction) {
-      return null;
-    }
+    if (!transaction) return null;
 
-    // ---
-    // --- THIS IS THE FIX: Convert status to lowercase for matching ---
-    // ---
-    switch (transaction.status.toLowerCase()) {
-      
+    // Safe lowercasing
+    const status = (transaction.status || '').toLowerCase();
+
+    switch (status) {
+       
       case 'awaiting signatures': 
         return <StageMultiSignature transaction={transaction} />;
         
@@ -63,13 +64,9 @@ const AdvocateTransactionDetailPage = () => {
         return <AdvocateStageAwaitingVerification transaction={transaction} />;
 
       case 'verified':
-        return null; // Placeholder
-
       case 'under review':
-        return null; // Placeholder
-
       case 'finalized':
-        return null; // Placeholder
+        return null; // Placeholder for now, or add specific Advocate view components here
         
       case 'initiated':
       default:
@@ -92,19 +89,44 @@ const AdvocateTransactionDetailPage = () => {
       </div>
     );
   }
-  
+   
   const stageComponent = renderStageContent();
+  const currentStatus = (transaction.status || '').toLowerCase();
+
+  // --- LOGIC: Define which stages allow the history card ---
+  const stagesWithHistory = [
+    'docs shared', 
+    'awaiting verification', 
+    'under review', 
+    'verified', 
+    'finalized'
+  ];
+  const showHistory = stagesWithHistory.includes(currentStatus);
+
+  console.log(transaction)
 
   return (
     <div className="transaction-detail-container">
-      
+       
       <div className="detail-main-content">
         <DealHeader currentStage={transaction.status} />
         
+        {/* --- Card 1: Transaction Details --- */}
         <div className="tab-content-container">
           <TransactionDetails transaction={transaction} />
         </div>
         
+        {/* --- Card 2: Property History (Conditional) --- */}
+        {showHistory && (
+           <PropertyHistoryCard 
+              // Pass the data safely
+              parcelNumber={transaction.parcelNumber || "Unknown Parcel"}
+              location={transaction.location || "Unknown Location"}
+              propertyId={transaction.propertyId}
+           />
+        )}
+        
+        {/* --- Card 3: Interactive Stage Component --- */}
         {stageComponent && (
           <div className="tab-content-container">
             {stageComponent}

@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import './CreateTransaction.css';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth'; 
-
+import { useAuth } from '../hooks/useAuth';
+import { parseContractError } from '../utils/errorParser';
 import { ethers } from 'ethers';
-import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../constants'; 
+import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../constants';
 
-// --- InputGroup Component (Unchanged) ---
 const InputGroup = ({ label, type = 'text', placeholder, id, name, value, onChange }) => (
   <div className="input-group">
     <label htmlFor={id}>{label}</label>
@@ -22,7 +21,6 @@ const InputGroup = ({ label, type = 'text', placeholder, id, name, value, onChan
   </div>
 );
 
-// --- Main CreateTransaction Component ---
 const CreateTransaction = () => {
   const navigate = useNavigate();
   const { currentUser, userData } = useAuth(); 
@@ -31,7 +29,7 @@ const CreateTransaction = () => {
   const [error, setError] = useState('');
 
   const [formData, setFormData] = useState({
-    'parcelNumber': '', // Switched back to parcelNumber
+    'parcelNumber': '',
     'location': '',
     'seller-id': '',
     'seller-name': '',
@@ -64,7 +62,7 @@ const CreateTransaction = () => {
     setIsLoading(true);
 
     try {
-      // --- 1. CONNECT & GET ID TOKEN ---
+      // 1. CONNECT & GET ID TOKEN
       setLoadingStatus('Connecting to wallet...');
       const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
@@ -77,7 +75,7 @@ const CreateTransaction = () => {
       
       const idToken = await currentUser.getIdToken();
 
-      // --- 2. BACKEND LOOKUP ---
+      // 2. BACKEND LOOKUP
       setLoadingStatus('Finding user wallets and Token ID...');
       
       const lookupResponse = await fetch('http://localhost:5000/get-transaction-prereqs', {
@@ -98,9 +96,16 @@ const CreateTransaction = () => {
         throw new Error(prereqData.error || "Could not find wallets or Token ID.");
       }
 
-      const { sellerWalletAddress, buyerWalletAddress, tokenId } = prereqData;
+      const { 
+        sellerWalletAddress, 
+        buyerWalletAddress, 
+        tokenId,
+        propertyId  // ← NOW WE GET THIS FROM BACKEND
+      } = prereqData;
 
-      // --- 3. CALL ON-CHAIN FUNCTION ---
+      console.log('✅ Prerequisites:', { sellerWalletAddress, buyerWalletAddress, tokenId, propertyId });
+
+      // 3. CALL ON-CHAIN FUNCTION
       setLoadingStatus('Waiting for blockchain confirmation...');
       const landContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
@@ -115,16 +120,12 @@ const CreateTransaction = () => {
       const receipt = await tx.wait();
       const txHash = receipt.hash;
       
-      // ---
-      // --- *** THIS IS THE NEW LOGIC *** ---
-      // ---
       // Parse the logs to find the on-chain transactionId
       let onChainTxId = null;
       for (const log of receipt.logs) {
         try {
           const parsedLog = landContract.interface.parseLog(log);
           if (parsedLog && parsedLog.name === "TransactionInitiated") {
-            // Found the event! Get the bytes32 transactionId
             onChainTxId = parsedLog.args.transactionId;
             break; 
           }
@@ -135,25 +136,26 @@ const CreateTransaction = () => {
         throw new Error("Transaction succeeded but failed to parse the on-chain transactionId from events.");
       }
       
-      console.log(`Transaction mined: ${txHash}, On-Chain ID: ${onChainTxId}`);
-      // --- *** END OF NEW LOGIC *** ---
+      console.log(`✅ Transaction mined: ${txHash}, On-Chain ID: ${onChainTxId}`);
 
-
-      // --- 4. PREPARE PAYLOAD FOR FIREBASE ---
+      // 4. PREPARE PAYLOAD FOR FIREBASE
       setLoadingStatus('Saving data to database...');
       
       const payload = {
         ...formData,
+        propertyId: propertyId,  // ← NOW INCLUDED
         txHash: txHash,
-        onChainTxId: onChainTxId, // --- SEND THE NEW ID TO THE BACKEND ---
+        onChainTxId: onChainTxId,
         tokenId: tokenId,
         advocateAddress: advocateAddress,
         sellerWalletAddress: sellerWalletAddress,
         buyerWalletAddress: buyerWalletAddress,
-        status: "Awaiting Signatures" // <-- Set initial status
+        status: "Awaiting Signatures"
       };
 
-      // --- 5. SEND TO BACKEND TO BE SAVED ---
+      console.log('📤 Sending to backend:', payload);
+
+      // 5. SEND TO BACKEND TO BE SAVED
       const createResponse = await fetch('http://localhost:5000/create-transaction', {
         method: 'POST',
         headers: {
@@ -166,14 +168,15 @@ const CreateTransaction = () => {
       const result = await createResponse.json();
 
       if (createResponse.ok) {
-        alert('Transaction successfully initiated and saved!');
+        alert('✅ Transaction successfully initiated and saved!');
         navigate(`/advocate/transactions/${result.transactionId}`); 
       } else {
         throw new Error(result.error || 'On-chain transaction succeeded, but saving to database failed.');
       }
     } catch (err) {
-      console.error('Submission error:', err);
-      setError(err.reason || err.message); 
+      console.error('❌ Submission error:', err);
+      const userMessage = parseContractError(err);
+      setError(userMessage);
     } finally {
       setIsLoading(false);
       setLoadingStatus('');
@@ -191,7 +194,7 @@ const CreateTransaction = () => {
 
       <form className="transaction-form-card" onSubmit={handleInitiate}>
 
-        {/* --- Section 1: Property Details --- */}
+        {/* Section 1: Property Details */}
         <section className="form-section">
           <h3 className="section-title">1. Property Details</h3>
           <div className="form-grid">
@@ -214,7 +217,7 @@ const CreateTransaction = () => {
           </div>
         </section>
 
-        {/* --- Section 2: Seller's Details --- */}
+        {/* Section 2: Seller's Details */}
         <section className="form-section">
           <h3 className="section-title">2. Seller's Details</h3>
           <div className="form-grid">
@@ -255,7 +258,7 @@ const CreateTransaction = () => {
           </div>
         </section>
 
-        {/* --- Section 3: Buyer's Details --- */}
+        {/* Section 3: Buyer's Details */}
         <section className="form-section">
           <h3 className="section-title">3. Buyer's Details</h3>
           <div className="form-grid">
@@ -296,7 +299,7 @@ const CreateTransaction = () => {
           </div>
         </section>
 
-        {/* --- Form Submission --- */}
+        {/* Form Submission */}
         <div className="form-actions">
           {error && <p className="form-error-message">{error}</p>}
           <button 
@@ -312,4 +315,4 @@ const CreateTransaction = () => {
   );
 };
 
-export default CreateTransaction;// Updated Oct 14
+export default CreateTransaction;
